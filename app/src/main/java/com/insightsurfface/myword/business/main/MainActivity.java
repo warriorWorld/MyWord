@@ -1,4 +1,4 @@
-package com.insightsurfface.myword.business;
+package com.insightsurfface.myword.business.main;
 
 import androidx.appcompat.app.AppCompatActivity;
 
