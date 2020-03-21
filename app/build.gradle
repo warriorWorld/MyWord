@@ -34,7 +34,12 @@ dependencies {
     implementation files('libs/YoudaoBase_v2.0.2.jar')
     implementation files('libs/YoudaoTranslateOnline_v2.0.0.jar')
     implementation files('libs/universal-image-loader-1.9.5.jar')
-    implementation files('libs/Volley.jar')
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'pub.devrel:easypermissions:0.4.2'
+    //RXJAVA
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.14-RC1'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.2.0'
 }
