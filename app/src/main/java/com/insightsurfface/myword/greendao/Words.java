@@ -18,6 +18,8 @@ public class Words {
     private int recognize_time;
     private String translate;
     private int review_time;
+    private long update_time;
+    private long created_time;
     @ToOne(joinProperty = "fk_bookId")
     private WordsBook wordsBook;
     /**
@@ -31,15 +33,17 @@ public class Words {
     @Generated(hash = 1243070387)
     private transient WordsDao myDao;
 
-    @Generated(hash = 1324748466)
-    public Words(long id, long fk_bookId, String word, int recognize_time,
-                 String translate, int review_time) {
+    @Generated(hash = 1950925209)
+    public Words(long id, long fk_bookId, String word, int recognize_time, String translate,
+            int review_time, long update_time, long created_time) {
         this.id = id;
         this.fk_bookId = fk_bookId;
         this.word = word;
         this.recognize_time = recognize_time;
         this.translate = translate;
         this.review_time = review_time;
+        this.update_time = update_time;
+        this.created_time = created_time;
     }
 
     @Generated(hash = 796553661)
@@ -171,9 +175,23 @@ public class Words {
         myDao.update(this);
     }
 
-    /**
-     * called by internal mechanisms, do not call yourself.
-     */
+    public long getUpdate_time() {
+        return this.update_time;
+    }
+
+    public void setUpdate_time(long update_time) {
+        this.update_time = update_time;
+    }
+
+    public long getCreated_time() {
+        return this.created_time;
+    }
+
+    public void setCreated_time(long created_time) {
+        this.created_time = created_time;
+    }
+
+    /** called by internal mechanisms, do not call yourself. */
     @Generated(hash = 862469939)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;

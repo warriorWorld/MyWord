@@ -19,11 +19,14 @@ import java.util.List;
 public class MainActivity extends BaseActivity implements MainContract.View {
     private RecyclerView wordsTablesRcv;
     private WordsTablesAdapter adapter;
+    private MainContract.Presenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initUI();
+        setPresenter(new MainPresenter(this, this));
+        mPresenter.getWordsTables();
     }
 
     private void initUI() {
@@ -35,6 +38,8 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         wordsTablesRcv.setHasFixedSize(true);
         LayoutAnimationController controller = new LayoutAnimationController(AnimationUtils.loadAnimation(this, R.anim.recycler_load));
         wordsTablesRcv.setLayoutAnimation(controller);
+        baseTopBar.hideLeftButton();
+        baseTopBar.setTitle(getString(R.string.app_name));
     }
 
     @Override
@@ -71,6 +76,12 @@ public class MainActivity extends BaseActivity implements MainContract.View {
 
     @Override
     public void setPresenter(MainContract.Presenter presenter) {
+        mPresenter = presenter;
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPresenter.onDestroy();
     }
 }
