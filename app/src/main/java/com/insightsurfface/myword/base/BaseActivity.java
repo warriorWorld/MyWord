@@ -21,6 +21,7 @@ import com.insightsurfface.myword.widget.toast.EasyToast;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import androidx.appcompat.app.AppCompatActivity;
 import io.reactivex.disposables.CompositeDisposable;
 
 
@@ -28,7 +29,7 @@ import io.reactivex.disposables.CompositeDisposable;
  * 作者：苏航 on 2016/10/17 11:56
  * 邮箱：772192594@qq.com
  */
-public abstract class BaseActivity extends Activity {
+public abstract class BaseActivity extends AppCompatActivity {
     protected TopBar baseTopBar;
     protected EasyToast baseToast;
     public CompositeDisposable mObserver = new CompositeDisposable();
