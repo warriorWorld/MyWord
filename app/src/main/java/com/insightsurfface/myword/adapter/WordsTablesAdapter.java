@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.insightsurfface.myword.R;
-import com.insightsurfface.myword.greendao.WordsTables;
+import com.insightsurfface.myword.greendao.WordsBook;
 import com.insightsurfface.myword.listener.OnAddClickListener;
 import com.insightsurfface.myword.listener.OnRecycleItemClickListener;
 
@@ -23,7 +23,7 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     protected Context context;
     private final int TYPE_NORMAL = 0;
     private final int TYPE_END = 1;
-    private List<WordsTables> list;
+    private List<WordsBook> list;
     private OnRecycleItemClickListener mOnRecycleItemClickListener;
     private OnAddClickListener mOnAddClickListener;
 
@@ -47,7 +47,7 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder viewHolder, final int position) {
         if (getItemViewType(position) == TYPE_NORMAL) {
-            WordsTables item = list.get(position);
+            WordsBook item = list.get(position);
             NormalViewHolder vh = (NormalViewHolder) viewHolder;
             vh.nameTv.setText(item.getName());
             vh.tableRl.setOnClickListener(new View.OnClickListener() {
@@ -92,7 +92,7 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-    public void setList(List<WordsTables> list) {
+    public void setList(List<WordsBook> list) {
         this.list = list;
     }
 

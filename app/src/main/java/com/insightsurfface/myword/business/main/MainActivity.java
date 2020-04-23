@@ -1,24 +1,18 @@
 package com.insightsurfface.myword.business.main;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
-import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 
 import com.insightsurfface.myword.R;
-import com.insightsurfface.myword.adapter.WordsAdapter;
 import com.insightsurfface.myword.adapter.WordsTablesAdapter;
 import com.insightsurfface.myword.base.BaseActivity;
-import com.insightsurfface.myword.db.DbAdapter;
-import com.insightsurfface.myword.greendao.WordsTables;
+import com.insightsurfface.myword.greendao.WordsBook;
 import com.insightsurfface.myword.listener.OnAddClickListener;
 import com.insightsurfface.myword.listener.OnRecycleItemClickListener;
-import com.insightsurfface.myword.listener.OnRecycleItemLongClickListener;
-import com.insightsurfface.myword.utils.Logger;
 
 import java.util.List;
 
@@ -49,7 +43,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     }
 
     @Override
-    public void displayWordsTables(List<WordsTables> list) {
+    public void displayWordsTables(List<WordsBook> list) {
         try {
             if (null == adapter) {
                 adapter = new WordsTablesAdapter(this);
