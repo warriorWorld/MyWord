@@ -9,6 +9,8 @@ import java.util.List;
 public class MainContract {
     interface Presenter extends BasePresenter {
         void getWordsTables();
+
+        void insertBook(WordsBook book);
     }
 
     interface View extends BaseView<Presenter> {

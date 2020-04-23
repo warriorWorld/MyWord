@@ -3,6 +3,7 @@ package com.insightsurfface.myword.business.main;
 import android.content.Context;
 
 import com.insightsurfface.myword.greendao.DbController;
+import com.insightsurfface.myword.greendao.WordsBook;
 
 public class MainPresenter implements MainContract.Presenter {
     private Context mContext;
@@ -16,6 +17,12 @@ public class MainPresenter implements MainContract.Presenter {
     @Override
     public void getWordsTables() {
         mView.displayWordsTables(DbController.getInstance(mContext.getApplicationContext()).querryAllWordsBook());
+    }
+
+    @Override
+    public void insertBook(WordsBook book) {
+        DbController.getInstance(mContext.getApplicationContext()).insert(book);
+        getWordsTables();
     }
 
     @Override
