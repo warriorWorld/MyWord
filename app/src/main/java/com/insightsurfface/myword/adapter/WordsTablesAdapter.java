@@ -26,6 +26,7 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private final int TYPE_END = 1;
     private List<WordsBook> list;
     private OnRecycleItemClickListener mOnRecycleItemClickListener;
+    private OnRecycleItemClickListener mOnRefreshClickListener;
     private OnRecycleItemLongClickListener mOnRecycleItemLongClickListener;
     private OnAddClickListener mOnAddClickListener;
 
@@ -74,6 +75,14 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         mOnRecycleItemLongClickListener.onItemLongClick(position);
                     }
                     return true;
+                }
+            });
+            vh.refreshIv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (null != mOnRefreshClickListener) {
+                        mOnRefreshClickListener.onItemClick(position);
+                    }
                 }
             });
         } else {
@@ -126,19 +135,24 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         mOnRecycleItemLongClickListener = onRecycleItemLongClickListener;
     }
 
+    public void setOnRefreshClickListener(OnRecycleItemClickListener onRefreshClickListener) {
+        mOnRefreshClickListener = onRefreshClickListener;
+    }
+
     //自定义的ViewHolder，持有每个Item的的所有界面元素
     public static class NormalViewHolder extends RecyclerView.ViewHolder {
         private View tableRl;
         private TextView nameTv;
         private TextView sizeTv;
+        private View refreshIv;
 
         public NormalViewHolder(View view) {
             super(view);
             tableRl = (View) view.findViewById(R.id.table_rl);
             nameTv = (TextView) view.findViewById(R.id.table_name_tv);
             sizeTv = (TextView) view.findViewById(R.id.table_size_tv);
+            refreshIv = view.findViewById(R.id.refresh_iv);
         }
-
     }
 
     //自定义的ViewHolder，持有每个Item的的所有界面元素

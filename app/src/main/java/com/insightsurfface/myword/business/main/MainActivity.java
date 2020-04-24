@@ -66,7 +66,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         dialog.show();
     }
 
-    private void showDeleteDialog(final long id) {
+    private void showDeleteDialog(final Long id) {
         new NormalDialogBuilder(this)
                 .setTitle("是否删除该单词本?")
                 .setOkText("删除")
@@ -76,6 +76,27 @@ public class MainActivity extends BaseActivity implements MainContract.View {
                     @Override
                     public void onOkClick() {
                         mPresenter.deleteBook(id);
+                    }
+
+                    @Override
+                    public void onCancelClick() {
+
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    private void showUpdateDialog(final WordsBook wordsBook) {
+        new NormalDialogBuilder(this)
+                .setTitle("是否更新该单词本?")
+                .setOkText("是")
+                .setCancelText("否")
+                .setTitleBold(true)
+                .setOnDialogClickListener(new NormalDialog.OnDialogClickListener() {
+                    @Override
+                    public void onOkClick() {
+                        mPresenter.updateBook(wordsBook);
                     }
 
                     @Override
@@ -110,6 +131,12 @@ public class MainActivity extends BaseActivity implements MainContract.View {
                     @Override
                     public void onItemLongClick(int position) {
                         showDeleteDialog(mList.get(position).getId());
+                    }
+                });
+                adapter.setOnRefreshClickListener(new OnRecycleItemClickListener() {
+                    @Override
+                    public void onItemClick(int position) {
+                        showUpdateDialog(mList.get(position));
                     }
                 });
                 wordsTablesRcv.setAdapter(adapter);

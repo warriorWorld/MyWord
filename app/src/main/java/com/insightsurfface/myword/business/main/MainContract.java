@@ -12,7 +12,9 @@ public class MainContract {
 
         void insertBook(WordsBook book);
 
-        void deleteBook(long id);
+        void deleteBook(Long id);
+
+        void updateBook(WordsBook book);
     }
 
     interface View extends BaseView<Presenter> {
