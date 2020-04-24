@@ -24,6 +24,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     private RecyclerView wordsTablesRcv;
     private WordsTablesAdapter adapter;
     private MainContract.Presenter mPresenter;
+    private List<WordsBook> mList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,11 +88,13 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     }
 
     @Override
-    public void displayWordsTables(final List<WordsBook> list) {
+    public void displayWordsTables(List<WordsBook> list) {
+        //这里如果用final的list 会导致之后无法更新list,所有listeener里的list的值都会是错误的 因为final是又复制了一份一样的list 但之后不会随着元数据的更改而更改
+        mList = list;
         try {
             if (null == adapter) {
                 adapter = new WordsTablesAdapter(this);
-                adapter.setList(list);
+                adapter.setList(mList);
                 adapter.setOnRecycleItemClickListener(new OnRecycleItemClickListener() {
                     @Override
                     public void onItemClick(int position) {
@@ -106,12 +109,12 @@ public class MainActivity extends BaseActivity implements MainContract.View {
                 adapter.setOnRecycleItemLongClickListener(new OnRecycleItemLongClickListener() {
                     @Override
                     public void onItemLongClick(int position) {
-                        showDeleteDialog(list.get(position).getId());
+                        showDeleteDialog(mList.get(position).getId());
                     }
                 });
                 wordsTablesRcv.setAdapter(adapter);
             } else {
-                adapter.setList(list);
+                adapter.setList(mList);
                 adapter.notifyDataSetChanged();
             }
         } catch (Exception e) {

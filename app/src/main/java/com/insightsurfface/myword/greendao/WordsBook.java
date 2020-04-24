@@ -12,57 +12,44 @@ import org.greenrobot.greendao.DaoException;
 @Entity
 public class WordsBook {
     @Id(autoincrement = true)//设置自增长
-    private long id;
+    private Long id;//必须使用Long(注意大写)否则无法自增
     private String name;
     private String url;
     @ToMany(referencedJoinProperty = "fk_bookId")
     private List<Words> words;
-    /**
-     * Used to resolve relations
-     */
+    /** Used to resolve relations */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
-    /**
-     * Used for active entity operations.
-     */
+    /** Used for active entity operations. */
     @Generated(hash = 1668108264)
     private transient WordsBookDao myDao;
-
-    @Generated(hash = 1831043958)
-    public WordsBook(long id, String name, String url) {
+    @Generated(hash = 1237885229)
+    public WordsBook(Long id, String name, String url) {
         this.id = id;
         this.name = name;
         this.url = url;
     }
-
     @Generated(hash = 1954146893)
     public WordsBook() {
     }
-
-    public long getId() {
+    public Long getId() {
         return this.id;
     }
-
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
-
     public String getName() {
         return this.name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
     public String getUrl() {
         return this.url;
     }
-
     public void setUrl(String url) {
         this.url = url;
     }
-
     /**
      * To-many relationship, resolved on first access (and after reset).
      * Changes to to-many relations are not persisted, make changes to the target entity.
@@ -84,15 +71,11 @@ public class WordsBook {
         }
         return words;
     }
-
-    /**
-     * Resets a to-many relationship, making the next get call to query for a fresh result.
-     */
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
     @Generated(hash = 1954400333)
     public synchronized void resetWords() {
         words = null;
     }
-
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#delete(Object)}.
      * Entity must attached to an entity context.
@@ -104,7 +87,6 @@ public class WordsBook {
         }
         myDao.delete(this);
     }
-
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#refresh(Object)}.
      * Entity must attached to an entity context.
@@ -116,7 +98,6 @@ public class WordsBook {
         }
         myDao.refresh(this);
     }
-
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#update(Object)}.
      * Entity must attached to an entity context.
@@ -128,7 +109,6 @@ public class WordsBook {
         }
         myDao.update(this);
     }
-
     /** called by internal mechanisms, do not call yourself. */
     @Generated(hash = 805162414)
     public void __setDaoSession(DaoSession daoSession) {
