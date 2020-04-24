@@ -10,6 +10,7 @@ import com.insightsurfface.myword.R;
 import com.insightsurfface.myword.greendao.WordsBook;
 import com.insightsurfface.myword.listener.OnAddClickListener;
 import com.insightsurfface.myword.listener.OnRecycleItemClickListener;
+import com.insightsurfface.myword.listener.OnRecycleItemLongClickListener;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private final int TYPE_END = 1;
     private List<WordsBook> list;
     private OnRecycleItemClickListener mOnRecycleItemClickListener;
+    private OnRecycleItemLongClickListener mOnRecycleItemLongClickListener;
     private OnAddClickListener mOnAddClickListener;
 
     public WordsTablesAdapter(Context context) {
@@ -50,6 +52,13 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             WordsBook item = list.get(position);
             NormalViewHolder vh = (NormalViewHolder) viewHolder;
             vh.nameTv.setText(item.getName());
+            String size;
+            if (null == item.getWords() || item.getWords().size() == 0) {
+                size = "0";
+            } else {
+                size = item.getWords().size() + "";
+            }
+            vh.sizeTv.setText(size);
             vh.tableRl.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -58,12 +67,21 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     }
                 }
             });
+            vh.tableRl.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (null != mOnRecycleItemLongClickListener) {
+                        mOnRecycleItemLongClickListener.onItemLongClick(position);
+                    }
+                    return true;
+                }
+            });
         } else {
             ListEndViewHolder evh = (ListEndViewHolder) viewHolder;
             evh.addRl.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (null!=mOnAddClickListener){
+                    if (null != mOnAddClickListener) {
                         mOnAddClickListener.onClick();
                     }
                 }
@@ -102,6 +120,10 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public void setOnAddClickListener(OnAddClickListener onAddClickListener) {
         mOnAddClickListener = onAddClickListener;
+    }
+
+    public void setOnRecycleItemLongClickListener(OnRecycleItemLongClickListener onRecycleItemLongClickListener) {
+        mOnRecycleItemLongClickListener = onRecycleItemLongClickListener;
     }
 
     //自定义的ViewHolder，持有每个Item的的所有界面元素

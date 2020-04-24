@@ -90,7 +90,11 @@ public class AddBookDialog extends Dialog {
         });
     }
 
-    interface OnAddBookListener {
+    public void setOnAddClickListener(OnAddBookListener onAddClickListener) {
+        mOnAddClickListener = onAddClickListener;
+    }
+
+    public interface OnAddBookListener {
         void onOkClick(String name, String url);
     }
 }

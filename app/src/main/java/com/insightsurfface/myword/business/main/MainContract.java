@@ -11,6 +11,8 @@ public class MainContract {
         void getWordsTables();
 
         void insertBook(WordsBook book);
+
+        void deleteBook(long id);
     }
 
     interface View extends BaseView<Presenter> {

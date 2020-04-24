@@ -130,7 +130,7 @@ public class DbController {
     /**
      * 删除数据
      */
-    public void delete(String wherecluse) {
-        mWordsBookDao.queryBuilder().where(WordsBookDao.Properties.Name.eq(wherecluse)).buildDelete().executeDeleteWithoutDetachingEntities();
+    public void deleteWordsBookById(long id) {
+        mWordsBookDao.queryBuilder().where(WordsBookDao.Properties.Id.eq(id)).buildDelete().executeDeleteWithoutDetachingEntities();
     }
 }

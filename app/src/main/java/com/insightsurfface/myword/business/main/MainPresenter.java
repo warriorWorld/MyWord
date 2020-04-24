@@ -26,6 +26,12 @@ public class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
+    public void deleteBook(long id) {
+        DbController.getInstance(mContext.getApplicationContext()).deleteWordsBookById(id);
+        getWordsTables();
+    }
+
+    @Override
     public void onDestroy() {
         mContext = null;
         mView = null;

@@ -13,6 +13,10 @@ import com.insightsurfface.myword.base.BaseActivity;
 import com.insightsurfface.myword.greendao.WordsBook;
 import com.insightsurfface.myword.listener.OnAddClickListener;
 import com.insightsurfface.myword.listener.OnRecycleItemClickListener;
+import com.insightsurfface.myword.listener.OnRecycleItemLongClickListener;
+import com.insightsurfface.myword.widget.dialog.AddBookDialog;
+import com.insightsurfface.myword.widget.dialog.NormalDialog;
+import com.insightsurfface.myword.widget.dialog.NormalDialogBuilder;
 
 import java.util.List;
 
@@ -47,8 +51,43 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         return R.layout.activity_main;
     }
 
+    private void showAddBookDialog() {
+        AddBookDialog dialog = new AddBookDialog(this);
+        dialog.setOnAddClickListener(new AddBookDialog.OnAddBookListener() {
+            @Override
+            public void onOkClick(String name, String url) {
+                WordsBook wordsBook = new WordsBook();
+                wordsBook.setName(name);
+                wordsBook.setUrl(url);
+                mPresenter.insertBook(wordsBook);
+            }
+        });
+        dialog.show();
+    }
+
+    private void showDeleteDialog(final long id) {
+        new NormalDialogBuilder(this)
+                .setTitle("是否删除该单词本?")
+                .setOkText("删除")
+                .setCancelText("取消")
+                .setTitleBold(true)
+                .setOnDialogClickListener(new NormalDialog.OnDialogClickListener() {
+                    @Override
+                    public void onOkClick() {
+                        mPresenter.deleteBook(id);
+                    }
+
+                    @Override
+                    public void onCancelClick() {
+
+                    }
+                })
+                .create()
+                .show();
+    }
+
     @Override
-    public void displayWordsTables(List<WordsBook> list) {
+    public void displayWordsTables(final List<WordsBook> list) {
         try {
             if (null == adapter) {
                 adapter = new WordsTablesAdapter(this);
@@ -61,7 +100,13 @@ public class MainActivity extends BaseActivity implements MainContract.View {
                 adapter.setOnAddClickListener(new OnAddClickListener() {
                     @Override
                     public void onClick() {
-
+                        showAddBookDialog();
+                    }
+                });
+                adapter.setOnRecycleItemLongClickListener(new OnRecycleItemLongClickListener() {
+                    @Override
+                    public void onItemLongClick(int position) {
+                        showDeleteDialog(list.get(position).getId());
                     }
                 });
                 wordsTablesRcv.setAdapter(adapter);

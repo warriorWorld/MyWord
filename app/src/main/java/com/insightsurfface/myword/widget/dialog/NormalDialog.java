@@ -203,7 +203,7 @@ public class NormalDialog extends Dialog {
         this.titleLeft = titleLeft;
     }
 
-    interface OnDialogClickListener {
+    public interface OnDialogClickListener {
         void onOkClick();
 
         void onCancelClick();
