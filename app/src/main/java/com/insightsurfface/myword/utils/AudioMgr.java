@@ -18,79 +18,79 @@ import com.youdao.sdk.common.util.AsyncTasks;
  * @author lukun
  */
 public class AudioMgr {
-    public static final String PLAY_LOG = "TranslatePlay ：";
+  public static final String PLAY_LOG = "TranslatePlay ：";
 
-    public interface SuccessListener {
-        public void success();
+  public interface SuccessListener {
+    public void success();
 
-        public void playover();
+    public void playover();
+  }
+
+  public static void startPlayVoice(String url, SuccessListener listener) {
+    try {
+      AsyncTasks.safeExecuteOnExecutor(new PlayTask(url, listener));
+    } catch (Exception e) {
+      YouDaoLog.e(AudioMgr.PLAY_LOG + "AudioMgr startPlayVoice", e);
+      Log.d("AudioMgr", "fail to fetch data: ", e);
+    }
+  }
+
+  static class PlayTask extends AsyncTask<Void, Void, Void> {
+    private String mUrl;
+
+    private SuccessListener listener;
+
+    public PlayTask(String url, SuccessListener listener) {
+      mUrl = url;
+      this.listener = listener;
     }
 
-    public static void startPlayVoice(String url, SuccessListener listener) {
-        try {
-            AsyncTasks.safeExecuteOnExecutor(new PlayTask(url, listener));
-        } catch (Exception e) {
-            YouDaoLog.e(AudioMgr.PLAY_LOG + "AudioMgr startPlayVoice", e);
-            Log.d("AudioMgr", "fail to fetch data: ", e);
-        }
+    @Override
+    protected void onPostExecute(Void result) {
+      super.onPostExecute(result);
+      if (isCancelled()) {
+        PlayMgr.getInstance().getMediaPlayer().stop();
+        onCancelled();
+        return;
+      }
     }
 
-    static class PlayTask extends AsyncTask<Void, Void, Void> {
-        private String mUrl;
+    @Override
+    protected void onCancelled() {
+    }
 
-        private SuccessListener listener;
+    @Override
+    protected Void doInBackground(Void... params) {
 
-        public PlayTask(String url, SuccessListener listener) {
-            mUrl = url;
-            this.listener = listener;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            if (isCancelled()) {
-                PlayMgr.getInstance().getMediaPlayer().stop();
-                onCancelled();
-                return;
-            }
-        }
+      MediaPlayer mediaPlayer = PlayMgr.getInstance()
+              .getMediaPlayer();
+      mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
 
         @Override
-        protected void onCancelled() {
+        public void onCompletion(MediaPlayer mp) {
+          YouDaoLog.e(AudioMgr.PLAY_LOG + "AudioMgr playTask play onCompletion");
+          if (listener != null) {
+            listener.playover();
+          }
         }
-
+      });
+      mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
         @Override
-        protected Void doInBackground(Void... params) {
-
-            MediaPlayer mediaPlayer = PlayMgr.getInstance()
-                    .getMediaPlayer();
-            mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
-
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    YouDaoLog.e(AudioMgr.PLAY_LOG + "AudioMgr playTask play onCompletion");
-                    if (listener != null) {
-                        listener.playover();
-                    }
-                }
-            });
-            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    YouDaoLog.e(AudioMgr.PLAY_LOG + "AudioMgr playTask on prepareOk");
-                    mp.start();
-                    YouDaoLog.e(AudioMgr.PLAY_LOG + "AudioMgr playTask play onStart");
-                }
-            });
-            mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                @Override
-                public boolean onError(MediaPlayer mp, int what, int extra) {
-                    YouDaoLog.e(AudioMgr.PLAY_LOG + "AudioMgr playTask onError");
-                    return false;
-                }
-            });
-            try {
-                mediaPlayer.reset();
+        public void onPrepared(MediaPlayer mp) {
+          YouDaoLog.e(AudioMgr.PLAY_LOG + "AudioMgr playTask on prepareOk");
+          mp.start();
+          YouDaoLog.e(AudioMgr.PLAY_LOG + "AudioMgr playTask play onStart");
+        }
+      });
+      mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+        @Override
+        public boolean onError(MediaPlayer mp, int what, int extra) {
+          YouDaoLog.e(AudioMgr.PLAY_LOG + "AudioMgr playTask onError");
+          return false;
+        }
+      });
+      try {
+        mediaPlayer.reset();
 
 //                Uri uri;
 //
@@ -98,14 +98,14 @@ public class AudioMgr {
 //                Map<String, String> headers = new HashMap<>();
 //                headers.put("Accept-Encoding","gzip, deflate");
 //                headers.put("Accept","*/*");
-                mediaPlayer.setDataSource(mUrl);
-                mediaPlayer.prepareAsync();// 进行缓冲\
-            } catch (Exception e) {
-                e.printStackTrace();
-                YouDaoLog.e(AudioMgr.PLAY_LOG + "AudioMgr playTask prepare error = " + e.toString());
-            }
-            return null;
-        }
+        mediaPlayer.setDataSource(mUrl);
+        mediaPlayer.prepareAsync();// 进行缓冲\
+      } catch (Exception e) {
+        e.printStackTrace();
+        YouDaoLog.e(AudioMgr.PLAY_LOG + "AudioMgr playTask prepare error = " + e.toString());
+      }
+      return null;
     }
+  }
 
 }
