@@ -1,7 +1,9 @@
 package com.insightsurfface.myword.greendao;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 
 import java.util.List;
 
@@ -105,7 +107,16 @@ public class DbController {
      * 插入一条记录，表里面要没有与之相同的记录
      */
     public long insert(Words word) {
-        return mWordsDao.insert(word);
+        if (TextUtils.isEmpty(word.getWord().replaceAll(" ", ""))) {
+            return -1;
+        }
+        try {
+            return mWordsDao.insert(word);
+        } catch (SQLiteConstraintException e) {
+            //非UNIQUE会插入失败,但是失败也无所谓
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     /**

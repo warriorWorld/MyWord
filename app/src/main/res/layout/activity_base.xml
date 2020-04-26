@@ -5,17 +5,17 @@
     android:layout_height="match_parent">
 
 
-    <com.insightsurfface.myword.widget.bar.TopBar
-        android:id="@+id/base_topbar"
-        android:layout_width="match_parent"
-        android:layout_height="47dp"
-        android:background="@color/white"
-        app:left_background="@drawable/nav_back_icon"
-        app:title_textColor="@color/main_text_color" />
+  <com.insightsurfface.myword.widget.bar.TopBar
+      android:id="@+id/base_topbar"
+      android:layout_width="match_parent"
+      android:layout_height="47dp"
+      android:background="@color/white"
+      app:left_background="@drawable/nav_back_icon"
+      app:title_textColor="@color/main_text_color" />
 
-    <FrameLayout
-        android:id="@+id/base_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/base_topbar" />
+  <FrameLayout
+      android:id="@+id/base_container"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_below="@+id/base_topbar" />
 </RelativeLayout>
