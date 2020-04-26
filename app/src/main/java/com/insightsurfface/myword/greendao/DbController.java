@@ -102,6 +102,13 @@ public class DbController {
     }
 
     /**
+     * 插入一条记录，表里面要没有与之相同的记录
+     */
+    public long insert(Words word) {
+        return mWordsDao.insert(word);
+    }
+
+    /**
      * 更新数据
      */
     public void update(WordsBook wordsBook) {

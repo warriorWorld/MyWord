@@ -8,6 +8,7 @@ import com.insightsurfface.myword.greendao.WordsBook;
 import com.insightsurfface.myword.listener.OnResultCallBack;
 import com.insightsurfface.myword.wordspresenter.WordsCrawler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainPresenter implements MainContract.Presenter {
@@ -42,17 +43,24 @@ public class MainPresenter implements MainContract.Presenter {
         new WordsCrawler().getWords(book.getUrl(), new OnResultCallBack<List<String>>() {
             @Override
             public void loadSucceed(List<String> result) {
-                WordsBook newBook = new WordsBook(book.getId(), book.getName(), book.getUrl());
                 if (null == book.getWords() || book.getWords().size() == 0) {
                     for (String item : result) {
-                        Words word = new Words();
-                        word.setWord(item);
-
+                        insertOneWord(book, item);
                     }
-                }else {
-
+                } else {
+                    for (String item : result) {
+                        boolean isContains = false;
+                        for (Words word : book.getWords()) {
+                            if (item.equals(word.getWord())) {
+                                isContains = true;
+                                break;
+                            }
+                        }
+                        if (!isContains) {
+                            insertOneWord(book, item);
+                        }
+                    }
                 }
-                DbController.getInstance(mContext.getApplicationContext()).update(newBook);
                 getWordsTables();
             }
 
@@ -61,6 +69,18 @@ public class MainPresenter implements MainContract.Presenter {
 
             }
         });
+    }
+
+    private void insertOneWord(WordsBook book, String item) {
+        Words word = new Words();
+        word.setWord(item);
+        word.setCreated_time(System.currentTimeMillis());
+        word.setUpdate_time(System.currentTimeMillis());
+        word.setRecognize_time(0);
+        word.setReview_time(0);
+        word.setFk_bookId(book.getId());
+        word.setWordsBook(book);
+        DbController.getInstance(mContext.getApplicationContext()).insert(word);
     }
 
     @Override
