@@ -1,37 +1,24 @@
 package com.insightsurfface.myword.business.words1;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.ClipboardManager;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.VolleyError;
 import com.insightsurfface.myword.R;
 import com.insightsurfface.myword.adapter.WordsBookAdapter;
 import com.insightsurfface.myword.base.TTSActivity;
+import com.insightsurfface.myword.bean.YoudaoResponse;
 import com.insightsurfface.myword.greendao.Words;
-import com.truthower.suhang.mangareader.R;
-import com.truthower.suhang.mangareader.bean.WordsBookBean;
-import com.truthower.suhang.mangareader.bean.YoudaoResponse;
-import com.truthower.suhang.mangareader.config.Configure;
-import com.truthower.suhang.mangareader.config.ShareKeys;
-import com.truthower.suhang.mangareader.db.DbAdapter;
-import com.truthower.suhang.mangareader.spider.FileSpider;
-import com.truthower.suhang.mangareader.utils.ImageUtil;
-import com.truthower.suhang.mangareader.utils.SharedPreferencesUtils;
-import com.truthower.suhang.mangareader.utils.VibratorUtil;
-import com.truthower.suhang.mangareader.volley.VolleyCallBack;
-import com.truthower.suhang.mangareader.volley.VolleyTool;
-import com.truthower.suhang.mangareader.widget.dialog.TailorImgDialog;
+import com.insightsurfface.myword.listener.OnSpeakClickListener;
+import com.insightsurfface.myword.utils.VibratorUtil;
+import com.insightsurfface.myword.widget.dialog.TranslateResultDialog;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 import androidx.viewpager.widget.ViewPager;
 
@@ -40,23 +27,22 @@ import androidx.viewpager.widget.ViewPager;
  * <p/>
  * Created by Administrator on 2016/4/4.
  */
-public class WordsBookActivity extends TTSActivity implements OnClickListener {
+public class WordsBookActivity extends TTSActivity implements OnClickListener, WordsBookContract.View {
     private WordsBookAdapter adapter;
     private View emptyView;
     private TextView topBarRight, topBarLeft;
     private ViewPager vp;
-    private ArrayList<Words> wordsList = new ArrayList<Words>();
-    private int nowPosition = 0;
+    private List<Words> wordsList;
+    private int currentPosition = 0;
     private ClipboardManager clip;//复制文本用
     private View killBtn;
-    private View exampleIv, translateIv;
+    private WordsBookContract.Presenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         clip = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         initUI();
-        refresh();
     }
 
     @Override
@@ -64,55 +50,13 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener {
         super.onResume();
     }
 
-    private void refresh() {
-        try {
-            wordsList = db.queryAllWordsBook();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(500);
-                        text2Speech(wordsList.get(0).getWord());
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-            if (null == wordsList || wordsList.size() == 0) {
-                emptyView.setVisibility(View.VISIBLE);
-                killBtn.setVisibility(View.GONE);
-            } else {
-                if (mOrderType == OrderType.RANDOM) {
-                    Collections.shuffle(wordsList);
-                }
-                emptyView.setVisibility(View.GONE);
-                killBtn.setVisibility(View.VISIBLE);
-            }
-            initViewPager();
-            try {
-                WordsBookBean item = wordsList.get(nowPosition);
-                topBarRight.setText("查询次数:" + item.getTime());
-                topBarLeft.setText("总计:" + wordsList.size() + "个生词,当前位置:" + (nowPosition + 1));
-            } catch (IndexOutOfBoundsException e) {
-                e.printStackTrace();
-            }
-        } catch (Exception e) {
-
-        }
-    }
-
-
     private void initUI() {
         vp = (ViewPager) findViewById(R.id.words_viewpager);
         emptyView = findViewById(R.id.empty_view);
         killBtn = findViewById(R.id.kill_btn);
         topBarLeft = (TextView) findViewById(R.id.top_bar_left);
         topBarRight = (TextView) findViewById(R.id.top_bar_right);
-        exampleIv = findViewById(R.id.example_iv);
-        translateIv = findViewById(R.id.translate_iv);
-        translateIv.setOnClickListener(this);
         killBtn.setOnClickListener(this);
-        exampleIv.setOnClickListener(this);
         baseTopBar.setTitle("生词本");
     }
 
@@ -134,7 +78,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener {
 
                 @Override
                 public void queryWord(String word) {
-                    translation(word);
+                    mPresenter.translateWord(currentPosition, word);
                 }
 
                 @Override
@@ -145,7 +89,6 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener {
             });
             adapter.setList(wordsList);
             vp.setAdapter(adapter);
-            recoverState();
             vp.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -154,16 +97,9 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener {
 
                 @Override
                 public void onPageSelected(int position) {
-                    nowPosition = position;
-                    WordsBookBean item = wordsList.get(nowPosition);
-                    topBarRight.setText("查询次数:" + item.getTime());
+                    currentPosition = position;
                     topBarLeft.setText("总计:" + wordsList.size() + "个生词,当前位置:" + (position + 1));
                     text2Speech(wordsList.get(position).getWord());
-                    if (TextUtils.isEmpty(wordsList.get(nowPosition).getExample_path())) {
-                        exampleIv.setVisibility(View.GONE);
-                    } else {
-                        exampleIv.setVisibility(View.VISIBLE);
-                    }
                 }
 
                 @Override
@@ -178,126 +114,85 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener {
         }
     }
 
-    private void translation(final String word) {
-        clip.setText(word);
-        text2Speech(word);
-        String url = Configure.YOUDAO + word;
-        HashMap<String, String> params = new HashMap<String, String>();
-        VolleyCallBack<YoudaoResponse> callback = new VolleyCallBack<YoudaoResponse>() {
-
-            @Override
-            public void loadSucceed(YoudaoResponse result) {
-                if (null != result && result.getErrorCode() == 0) {
-                    YoudaoResponse.BasicBean item = result.getBasic();
-                    String t = "";
-                    if (null != item) {
-                        for (int i = 0; i < item.getExplains().size(); i++) {
-                            t = t + item.getExplains().get(i) + ";";
-                        }
-                        adapter.getNowView().setTranslate(result.getQuery() + " [" + item.getPhonetic() +
-                                "]: " + "\n" + t);
-                    } else {
-                        adapter.getNowView().setTranslate("没查到该词");
-                    }
-                } else {
-                    adapter.getNowView().setTranslate("网络连接失败");
-                }
-            }
-
-            @Override
-            public void loadFailed(VolleyError error) {
-                baseToast.showToast("error\n" + error);
-            }
-
-            @Override
-            public void loadSucceedButNotNormal(YoudaoResponse result) {
-
-            }
-        };
-        VolleyTool.getInstance(this).requestData(Request.Method.GET,
-                WordsBookActivity.this, url, params,
-                YoudaoResponse.class, callback);
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        db.closeDb();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        saveState();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        saveState();
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        recoverState();
-    }
-
-    private void saveState() {
-        if (mOrderType == OrderType.ORDER) {
-            SharedPreferencesUtils.setSharedPreferencesData(this, ShareKeys.WORDS_BOOK_PROGRESS_KEY,
-                    nowPosition);
-        }
-    }
-
-    private void recoverState() {
-        if (mOrderType == OrderType.ORDER) {
-            int p = SharedPreferencesUtils.getIntSharedPreferencesData(this,
-                    ShareKeys.WORDS_BOOK_PROGRESS_KEY);
-            if (p >= 0) {
-                nowPosition = p;
-                vp.setCurrentItem(p);
-            }
-        }
-    }
-
-    private void showExampleDialog() {
-        TailorImgDialog imgDialog = new TailorImgDialog(this);
-        imgDialog.show();
-        imgDialog.setWord(wordsList.get(nowPosition).getWord());
-        Bitmap bitmap = ImageUtil.getLoacalBitmap(wordsList.get(nowPosition).getExample_path()); //从本地取图片(在cdcard中获取)  //
-//        imgDialog.setImgRes("file://"+wordsList.get(nowPosition).getExample_path());
-        imgDialog.setImgRes(bitmap);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.kill_btn:
-                //太吵
-//                TipVoiceManager.getInstance().voiceTip(0);
-                try {
-                    VibratorUtil.Vibrate(WordsBookActivity.this, 100);
-                    WordsBookBean item = wordsList.get(nowPosition);
-                    db.deleteWordByWord(item.getWord());
-                    wordsList.remove(nowPosition);
-                    FileSpider.getInstance().deleteFile(item.getExample_path());
-                    initViewPager();
-                    if (wordsList.size() <= 0) {
-                        baseToast.showToast("PENTA KILL!!!");
-                        finish();
-                    }
-                } catch (IndexOutOfBoundsException e) {
-                    WordsBookActivity.this.finish();
-                }
-                break;
-            case R.id.example_iv:
-                showExampleDialog();
-                break;
-            case R.id.translate_iv:
-                adapter.getNowView().playWordTvAnimation();
+                mPresenter.killWord(currentPosition, wordsList.get(currentPosition).getWord());
                 break;
         }
     }
 
+    @Override
+    public void displayWords(List<Words> list) {
+        try {
+            wordsList = list;
+            if (null == wordsList || wordsList.size() == 0) {
+                emptyView.setVisibility(View.VISIBLE);
+                killBtn.setVisibility(View.GONE);
+            } else {
+                Collections.shuffle(wordsList);
+                emptyView.setVisibility(View.GONE);
+                killBtn.setVisibility(View.VISIBLE);
+            }
+            initViewPager();
+            try {
+                topBarLeft.setText("总计:" + wordsList.size() + "个生词,当前位置:" + (currentPosition + 1));
+            } catch (IndexOutOfBoundsException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void displayTranslate(YoudaoResponse translate) {
+        TranslateResultDialog translateResultDialog = new TranslateResultDialog(this);
+        translateResultDialog.setOnSpeakClickListener(new OnSpeakClickListener() {
+            @Override
+            public void onSpeakUSClick(String word) {
+                setLanguage(Locale.US);
+                text2Speech(word);
+            }
+
+            @Override
+            public void onSpeakUKClick(String word) {
+                setLanguage(Locale.UK);
+                text2Speech(word);
+            }
+        });
+        translateResultDialog.show();
+        translateResultDialog.setTranslate(translate);
+    }
+
+    @Override
+    public void displayKillWord(int position) {
+        try {
+            VibratorUtil.Vibrate(WordsBookActivity.this, 100);
+            wordsList.remove(position);
+            displayWords(wordsList);
+            if (wordsList.size() <= 0) {
+                baseToast.showToast("PENTA KILL!!!");
+                finish();
+            }
+        } catch (IndexOutOfBoundsException e) {
+            WordsBookActivity.this.finish();
+        }
+    }
+
+    @Override
+    public void displayErrorMsg(String msg) {
+        baseToast.showToast(msg);
+    }
+
+    @Override
+    public void setPresenter(WordsBookContract.Presenter presenter) {
+        mPresenter = presenter;
+    }
 }

@@ -123,11 +123,6 @@ public class DbController {
      * 更新数据
      */
     public void update(WordsBook wordsBook) {
-//        WordsBook mOldPersonInfor = mWordsBookDao.queryBuilder().where(WordsBookDao.Properties.Id.eq(wordsBook.getId())).build().unique();//拿到之前的记录
-//        if (mOldPersonInfor != null) {
-//            mOldPersonInfor.setName("张三");
-//            mWordsBookDao.update(mOldPersonInfor);
-//        }
         mWordsBookDao.update(wordsBook);
     }
 
@@ -147,9 +142,23 @@ public class DbController {
     }
 
     /**
+     * 查询所有数据
+     */
+    public List<Words> querryWordsByBook(Long bookId) {
+        return (List<Words>) mWordsDao.queryBuilder().where(WordsDao.Properties.Fk_bookId.eq(bookId)).build().unique();
+    }
+
+    /**
      * 删除数据
      */
     public void deleteWordsBookById(Long id) {
         mWordsBookDao.queryBuilder().where(WordsBookDao.Properties.Id.eq(id)).buildDelete().executeDeleteWithoutDetachingEntities();
+    }
+
+    /**
+     * 删除数据
+     */
+    public void deleteWord(String word) {
+        mWordsDao.queryBuilder().where(WordsDao.Properties.Word.eq(word)).buildDelete().executeDeleteWithoutDetachingEntities();
     }
 }

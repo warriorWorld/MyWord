@@ -7,12 +7,12 @@ import android.view.ViewGroup;
 import com.insightsurfface.myword.business.words1.WordsBookView;
 import com.insightsurfface.myword.greendao.Words;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import androidx.viewpager.widget.PagerAdapter;
 
 public class WordsBookAdapter extends PagerAdapter {
-    private ArrayList<Words> wordsList = new ArrayList<Words>();
+    private List<Words> wordsList;
     private Context context;
     private WordsBookView currentView;
     private WordsBookView.OnWordsBookViewListener onWordsBookViewListener;
@@ -23,7 +23,7 @@ public class WordsBookAdapter extends PagerAdapter {
         this.context = context;
     }
 
-    public void setList(ArrayList<Words> wordsList) {
+    public void setList(List<Words> wordsList) {
         this.wordsList = wordsList;
     }
 

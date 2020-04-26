@@ -7,4 +7,5 @@ package com.insightsurfface.myword.config;
 public class ShareKeys {
     public static final String KILLABLE_TIME_KEY = "killable_time_key";
     public static final String KILL_PERIOD_KEY = "kill_period_key";
+    public static final String OPEN_PREMIUM_VOICE_KEY = "open_premium_voice_key";
 }
