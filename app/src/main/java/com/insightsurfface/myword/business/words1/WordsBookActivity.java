@@ -37,12 +37,16 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     private ClipboardManager clip;//复制文本用
     private View killBtn;
     private WordsBookContract.Presenter mPresenter;
+    private Long bookId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         clip = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         initUI();
+        setPresenter(new WordsBookPresenter(this, this));
+        bookId = getIntent().getLongExtra("bookId", -1);
+        mPresenter.getWords(bookId);
     }
 
     @Override
@@ -117,6 +121,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mPresenter.onDestroy();
     }
 
     @Override

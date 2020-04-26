@@ -3,6 +3,7 @@ package com.insightsurfface.myword.business.main;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
@@ -10,6 +11,7 @@ import android.view.animation.LayoutAnimationController;
 import com.insightsurfface.myword.R;
 import com.insightsurfface.myword.adapter.WordsTablesAdapter;
 import com.insightsurfface.myword.base.BaseActivity;
+import com.insightsurfface.myword.business.words1.WordsBookActivity;
 import com.insightsurfface.myword.greendao.WordsBook;
 import com.insightsurfface.myword.listener.OnAddClickListener;
 import com.insightsurfface.myword.listener.OnRecycleItemClickListener;
@@ -109,7 +111,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     }
 
     @Override
-    public void displayWordsTables(List<WordsBook> list) {
+    public void displayWordsTables(final List<WordsBook> list) {
         //这里如果用final的list 会导致之后无法更新list,所有listeener里的list的值都会是错误的 因为final是又复制了一份一样的list 但之后不会随着元数据的更改而更改
         mList = list;
         try {
@@ -119,6 +121,9 @@ public class MainActivity extends BaseActivity implements MainContract.View {
                 adapter.setOnRecycleItemClickListener(new OnRecycleItemClickListener() {
                     @Override
                     public void onItemClick(int position) {
+                        Intent intent = new Intent(MainActivity.this, WordsBookActivity.class);
+                        intent.putExtra("bookId", list.get(position).getId());
+                        startActivity(intent);
                     }
                 });
                 adapter.setOnAddClickListener(new OnAddClickListener() {
