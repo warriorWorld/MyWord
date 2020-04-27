@@ -38,7 +38,6 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
     @Override
     public void translateWord(final Words word) {
         if (!TextUtils.isEmpty(word.getTranslate())) {
-            mView.displayMsg("保存的翻译");
             mView.displayTranslate(word.getTranslate());
             return;
         }
@@ -48,7 +47,7 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
                 if (null != result && result.getErrorCode() == 0) {
                     YoudaoResponse.BasicBean item = result.getBasic();
                     if (null != item) {
-                        String t = "";
+                        String t = word.getWord() + ":\n";
                         for (int i = 0; i < item.getExplains().size(); i++) {
                             t = t + item.getExplains().get(i) + ";\n";
                         }
