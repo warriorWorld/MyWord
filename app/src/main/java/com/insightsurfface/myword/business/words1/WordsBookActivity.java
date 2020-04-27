@@ -5,12 +5,12 @@ import android.os.Bundle;
 import android.text.ClipboardManager;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.insightsurfface.myword.R;
 import com.insightsurfface.myword.adapter.WordsBookAdapter;
 import com.insightsurfface.myword.base.TTSActivity;
-import com.insightsurfface.myword.bean.YoudaoResponse;
 import com.insightsurfface.myword.greendao.Words;
 import com.insightsurfface.myword.utils.VibratorUtil;
 
@@ -27,7 +27,6 @@ import androidx.viewpager.widget.ViewPager;
 public class WordsBookActivity extends TTSActivity implements OnClickListener, WordsBookContract.View {
     private WordsBookAdapter adapter;
     private View emptyView;
-    private TextView topBarRight, topBarLeft;
     private ViewPager vp;
     private List<Words> wordsList;
     private int currentPosition = 0;
@@ -35,6 +34,9 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     private View killBtn;
     private WordsBookContract.Presenter mPresenter;
     private Long bookId;
+    private TextView pageTv;
+    private Button recognizeBtn;
+    private Button incognizanceBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +57,12 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         vp = (ViewPager) findViewById(R.id.words_viewpager);
         emptyView = findViewById(R.id.empty_view);
         killBtn = findViewById(R.id.kill_btn);
-        topBarLeft = (TextView) findViewById(R.id.top_bar_left);
-        topBarRight = (TextView) findViewById(R.id.top_bar_right);
+        pageTv = findViewById(R.id.page_tv);
+        recognizeBtn = (Button) findViewById(R.id.recognize_btn);
+        incognizanceBtn = (Button) findViewById(R.id.incognizance_btn);
+
+        recognizeBtn.setOnClickListener(this);
+        incognizanceBtn.setOnClickListener(this);
         killBtn.setOnClickListener(this);
         baseTopBar.setTitle("生词本");
     }
@@ -79,7 +85,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
 
                 @Override
                 public void queryWord(String word) {
-                    mPresenter.translateWord(currentPosition, wordsList.get(currentPosition));
+                    mPresenter.translateWord(wordsList.get(currentPosition));
                 }
 
                 @Override
@@ -99,7 +105,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                 @Override
                 public void onPageSelected(int position) {
                     currentPosition = position;
-                    topBarLeft.setText("总计:" + wordsList.size() + "个生词,当前位置:" + (position + 1));
+                    pageTv.setText((position + 1) + "/" + wordsList.size());
                     text2Speech(wordsList.get(position).getWord());
                 }
 
@@ -125,7 +131,13 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.kill_btn:
-                mPresenter.killWord(currentPosition, wordsList.get(currentPosition));
+                mPresenter.killWord(wordsList.get(currentPosition));
+                break;
+            case R.id.recognize_btn:
+                mPresenter.recognizeWord(wordsList.get(currentPosition));
+                break;
+            case R.id.incognizance_btn:
+                mPresenter.incognizanceWord(wordsList.get(currentPosition));
                 break;
         }
     }
@@ -146,7 +158,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
             }
             initViewPager();
             try {
-                topBarLeft.setText("总计:" + wordsList.size() + "个生词,当前位置:" + (currentPosition + 1));
+                pageTv.setText((currentPosition + 1) + "/" + wordsList.size());
             } catch (IndexOutOfBoundsException e) {
                 e.printStackTrace();
             }
@@ -161,10 +173,10 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     }
 
     @Override
-    public void displayKillWord(int position) {
+    public void displayKillWord() {
         try {
             VibratorUtil.Vibrate(WordsBookActivity.this, 100);
-            wordsList.remove(position);
+            wordsList.remove(currentPosition);
             displayWords(wordsList, false);
             if (wordsList.size() <= 0) {
                 baseToast.showToast("PENTA KILL!!!");
@@ -183,6 +195,16 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                 baseToast.showToast(msg);
             }
         });
+    }
+
+    @Override
+    public void displayReconizeWord() {
+        displayKillWord();
+    }
+
+    @Override
+    public void toNextWord() {
+        vp.setCurrentItem(currentPosition + 1, true);
     }
 
     @Override

@@ -9,20 +9,28 @@ import java.util.List;
 
 public class WordsBookContract {
     interface Presenter extends BasePresenter {
-        void getWords(Long bookId,boolean shuffle);
+        void getWords(Long bookId, boolean shuffle);
 
-        void killWord(int position, Words word);
+        void killWord(Words word);
 
-        void translateWord(int position, Words word);
+        void translateWord(Words word);
+
+        void recognizeWord(Words word);
+
+        void incognizanceWord(Words word);
     }
 
     interface View extends BaseView<Presenter> {
-        void displayWords(List<Words> list,boolean shuffle);
+        void displayWords(List<Words> list, boolean shuffle);
 
         void displayTranslate(String translate);
 
-        void displayKillWord(int position);
+        void displayKillWord();
 
         void displayMsg(String msg);
+
+        void displayReconizeWord();
+
+        void toNextWord();
     }
 }

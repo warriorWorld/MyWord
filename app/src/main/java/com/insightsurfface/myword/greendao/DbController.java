@@ -135,6 +135,13 @@ public class DbController {
         word.setTranslate(translate);
         mWordsDao.update(word);
     }
+
+    public void updateRecongnizeTime(Words word) {
+        word.setRecognize_time(word.getRecognize_time() + 1);
+        word.setUpdate_time(System.currentTimeMillis());
+        mWordsDao.update(word);
+    }
+
     /**
      * 按条件查询数据
      */
@@ -154,6 +161,8 @@ public class DbController {
      * 查询所有数据
      */
     public List<Words> querryWordsByBook(Long bookId) {
+//        long timeGap = System.currentTimeMillis();
+//        timeGap = timeGap - 3 * 60 * 60 * 1000;
         return mWordsDao.queryBuilder().where(mWordsDao.queryBuilder().and(WordsDao.Properties.Fk_bookId.eq(bookId),
                 WordsDao.Properties.Is_dead.eq(false))).build().list();
     }

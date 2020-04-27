@@ -29,14 +29,14 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
     }
 
     @Override
-    public void killWord(int position, Words word) {
+    public void killWord(Words word) {
 //        DbController.getInstance(mContext.getApplicationContext()).deleteWord(word);
         DbController.getInstance(mContext.getApplicationContext()).killWord(word);
-        mView.displayKillWord(position);
+        mView.displayKillWord();
     }
 
     @Override
-    public void translateWord(final int position, final Words word) {
+    public void translateWord(final Words word) {
         if (!TextUtils.isEmpty(word.getTranslate())) {
             mView.displayMsg("保存的翻译");
             mView.displayTranslate(word.getTranslate());
@@ -57,7 +57,7 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
                                 updateTranslate(word, t);
                     } else {
                         mView.displayMsg("没查到该词");
-                        killWord(position, word);
+                        killWord(word);
                     }
                 } else {
                     mView.displayMsg("网络连接失败");
@@ -81,6 +81,17 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
+    }
+
+    @Override
+    public void recognizeWord(Words word) {
+        DbController.getInstance(mContext.getApplicationContext()).updateRecongnizeTime(word);
+        mView.displayReconizeWord();
+    }
+
+    @Override
+    public void incognizanceWord(Words word) {
+        mView.toNextWord();
     }
 
     @Override
