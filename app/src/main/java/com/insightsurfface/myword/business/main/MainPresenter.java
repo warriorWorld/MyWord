@@ -6,6 +6,7 @@ import com.insightsurfface.myword.greendao.DbController;
 import com.insightsurfface.myword.greendao.Words;
 import com.insightsurfface.myword.greendao.WordsBook;
 import com.insightsurfface.myword.listener.OnResultCallBack;
+import com.insightsurfface.myword.widget.toast.EasyToast;
 import com.insightsurfface.myword.wordspresenter.WordsCrawler;
 
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ public class MainPresenter implements MainContract.Presenter {
                         }
                     }
                 }
+                mView.displayMsg("更新完成");
                 getWordsTables();
             }
 

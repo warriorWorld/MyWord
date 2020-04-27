@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="120dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="120dp">
 
 
     <TextView
@@ -11,12 +11,17 @@
         android:layout_height="300dp"
         android:layout_centerInParent="true"
         android:layout_marginLeft="20dp"
+        android:autoSizeMaxTextSize="50sp"
+        android:autoSizeMinTextSize="14sp"
+        android:autoSizeStepGranularity="2sp"
+        android:autoSizeTextType="uniform"
         android:background="@drawable/round5_white"
         android:elevation="5dp"
         android:gravity="center"
+        android:maxLines="1"
         android:padding="26dp"
         android:text="Stranger"
         android:textColor="@color/main_text_color"
         android:textSize="38sp"
-        android:visibility="visible"/>
+        android:visibility="visible" />
 </RelativeLayout>

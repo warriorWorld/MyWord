@@ -12,13 +12,10 @@ import com.insightsurfface.myword.adapter.WordsBookAdapter;
 import com.insightsurfface.myword.base.TTSActivity;
 import com.insightsurfface.myword.bean.YoudaoResponse;
 import com.insightsurfface.myword.greendao.Words;
-import com.insightsurfface.myword.listener.OnSpeakClickListener;
 import com.insightsurfface.myword.utils.VibratorUtil;
-import com.insightsurfface.myword.widget.dialog.TranslateResultDialog;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 import androidx.viewpager.widget.ViewPager;
 
@@ -46,7 +43,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         initUI();
         setPresenter(new WordsBookPresenter(this, this));
         bookId = getIntent().getLongExtra("bookId", -1);
-        mPresenter.getWords(bookId);
+        mPresenter.getWords(bookId, true);
     }
 
     @Override
@@ -82,7 +79,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
 
                 @Override
                 public void queryWord(String word) {
-                    mPresenter.translateWord(currentPosition, word);
+                    mPresenter.translateWord(currentPosition, wordsList.get(currentPosition));
                 }
 
                 @Override
@@ -128,25 +125,26 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.kill_btn:
-                mPresenter.killWord(currentPosition, wordsList.get(currentPosition).getWord());
+                mPresenter.killWord(currentPosition, wordsList.get(currentPosition));
                 break;
         }
     }
 
     @Override
-    public void displayWords(List<Words> list) {
+    public void displayWords(List<Words> list, boolean shuffle) {
         try {
             wordsList = list;
             if (null == wordsList || wordsList.size() == 0) {
                 emptyView.setVisibility(View.VISIBLE);
                 killBtn.setVisibility(View.GONE);
             } else {
-                Collections.shuffle(wordsList);
+                if (shuffle) {
+                    Collections.shuffle(wordsList);
+                }
                 emptyView.setVisibility(View.GONE);
                 killBtn.setVisibility(View.VISIBLE);
             }
             initViewPager();
-            text2Speech(wordsList.get(currentPosition).getWord());
             try {
                 topBarLeft.setText("总计:" + wordsList.size() + "个生词,当前位置:" + (currentPosition + 1));
             } catch (IndexOutOfBoundsException e) {
@@ -158,23 +156,8 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     }
 
     @Override
-    public void displayTranslate(YoudaoResponse translate) {
-        TranslateResultDialog translateResultDialog = new TranslateResultDialog(this);
-        translateResultDialog.setOnSpeakClickListener(new OnSpeakClickListener() {
-            @Override
-            public void onSpeakUSClick(String word) {
-                setLanguage(Locale.US);
-                text2Speech(word);
-            }
-
-            @Override
-            public void onSpeakUKClick(String word) {
-                setLanguage(Locale.UK);
-                text2Speech(word);
-            }
-        });
-        translateResultDialog.show();
-        translateResultDialog.setTranslate(translate);
+    public void displayTranslate(String translate) {
+        adapter.getCurrentView().setTranslate(translate);
     }
 
     @Override
@@ -182,7 +165,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         try {
             VibratorUtil.Vibrate(WordsBookActivity.this, 100);
             wordsList.remove(position);
-            displayWords(wordsList);
+            displayWords(wordsList, false);
             if (wordsList.size() <= 0) {
                 baseToast.showToast("PENTA KILL!!!");
                 finish();
@@ -193,8 +176,13 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     }
 
     @Override
-    public void displayErrorMsg(String msg) {
-        baseToast.showToast(msg);
+    public void displayMsg(final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                baseToast.showToast(msg);
+            }
+        });
     }
 
     @Override

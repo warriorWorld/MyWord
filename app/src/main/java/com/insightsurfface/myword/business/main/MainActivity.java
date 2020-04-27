@@ -17,6 +17,7 @@ import com.insightsurfface.myword.listener.OnAddClickListener;
 import com.insightsurfface.myword.listener.OnRecycleItemClickListener;
 import com.insightsurfface.myword.listener.OnRecycleItemLongClickListener;
 import com.insightsurfface.myword.utils.ActivityPoor;
+import com.insightsurfface.myword.widget.bar.TopBar;
 import com.insightsurfface.myword.widget.dialog.AddBookDialog;
 import com.insightsurfface.myword.widget.dialog.NormalDialog;
 import com.insightsurfface.myword.widget.dialog.NormalDialogBuilder;
@@ -48,6 +49,23 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         wordsTablesRcv.setLayoutAnimation(controller);
         baseTopBar.hideLeftButton();
         baseTopBar.setTitle(getString(R.string.app_name));
+        baseTopBar.setRightBackground(R.drawable.ic_settings);
+        baseTopBar.setOnTopBarClickListener(new TopBar.OnTopBarClickListener() {
+            @Override
+            public void onLeftClick() {
+                finish();
+            }
+
+            @Override
+            public void onRightClick() {
+
+            }
+
+            @Override
+            public void onTitleClick() {
+
+            }
+        });
     }
 
     @Override
@@ -115,44 +133,59 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     public void displayWordsTables(final List<WordsBook> list) {
         //这里如果用final的list 会导致之后无法更新list,所有listeener里的list的值都会是错误的 因为final是又复制了一份一样的list 但之后不会随着元数据的更改而更改
         mList = list;
-        try {
-            if (null == adapter) {
-                adapter = new WordsTablesAdapter(this);
-                adapter.setList(mList);
-                adapter.setOnRecycleItemClickListener(new OnRecycleItemClickListener() {
-                    @Override
-                    public void onItemClick(int position) {
-                        Intent intent = new Intent(MainActivity.this, WordsBookActivity.class);
-                        intent.putExtra("bookId", mList.get(position).getId());
-                        startActivity(intent);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (null == adapter) {
+                        adapter = new WordsTablesAdapter(MainActivity.this);
+                        adapter.setList(mList);
+                        adapter.setOnRecycleItemClickListener(new OnRecycleItemClickListener() {
+                            @Override
+                            public void onItemClick(int position) {
+                                Intent intent = new Intent(MainActivity.this, WordsBookActivity.class);
+                                intent.putExtra("bookId", mList.get(position).getId());
+                                startActivity(intent);
+                            }
+                        });
+                        adapter.setOnAddClickListener(new OnAddClickListener() {
+                            @Override
+                            public void onClick() {
+                                showAddBookDialog();
+                            }
+                        });
+                        adapter.setOnRecycleItemLongClickListener(new OnRecycleItemLongClickListener() {
+                            @Override
+                            public void onItemLongClick(int position) {
+                                showDeleteDialog(mList.get(position).getId());
+                            }
+                        });
+                        adapter.setOnRefreshClickListener(new OnRecycleItemClickListener() {
+                            @Override
+                            public void onItemClick(int position) {
+                                showUpdateDialog(mList.get(position));
+                            }
+                        });
+                        wordsTablesRcv.setAdapter(adapter);
+                    } else {
+                        adapter.setList(mList);
+                        adapter.notifyDataSetChanged();
                     }
-                });
-                adapter.setOnAddClickListener(new OnAddClickListener() {
-                    @Override
-                    public void onClick() {
-                        showAddBookDialog();
-                    }
-                });
-                adapter.setOnRecycleItemLongClickListener(new OnRecycleItemLongClickListener() {
-                    @Override
-                    public void onItemLongClick(int position) {
-                        showDeleteDialog(mList.get(position).getId());
-                    }
-                });
-                adapter.setOnRefreshClickListener(new OnRecycleItemClickListener() {
-                    @Override
-                    public void onItemClick(int position) {
-                        showUpdateDialog(mList.get(position));
-                    }
-                });
-                wordsTablesRcv.setAdapter(adapter);
-            } else {
-                adapter.setList(mList);
-                adapter.notifyDataSetChanged();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
+    }
+
+    @Override
+    public void displayMsg(final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                baseToast.showToast(msg);
+            }
+        });
     }
 
     private void showQuitDialog() {

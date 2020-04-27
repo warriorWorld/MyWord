@@ -126,6 +126,15 @@ public class DbController {
         mWordsBookDao.update(wordsBook);
     }
 
+    public void killWord(Words word) {
+        word.setIs_dead(true);
+        mWordsDao.update(word);
+    }
+
+    public void updateTranslate(Words word, String translate) {
+        word.setTranslate(translate);
+        mWordsDao.update(word);
+    }
     /**
      * 按条件查询数据
      */
@@ -145,7 +154,8 @@ public class DbController {
      * 查询所有数据
      */
     public List<Words> querryWordsByBook(Long bookId) {
-        return  mWordsDao.queryBuilder().where(WordsDao.Properties.Fk_bookId.eq(bookId)).build().list();
+        return mWordsDao.queryBuilder().where(mWordsDao.queryBuilder().and(WordsDao.Properties.Fk_bookId.eq(bookId),
+                WordsDao.Properties.Is_dead.eq(false))).build().list();
     }
 
     /**

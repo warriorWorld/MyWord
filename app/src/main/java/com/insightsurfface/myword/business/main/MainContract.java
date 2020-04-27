@@ -19,5 +19,7 @@ public class MainContract {
 
     interface View extends BaseView<Presenter> {
         void displayWordsTables(List<WordsBook> list);
+
+        void displayMsg(String msg);
     }
 }

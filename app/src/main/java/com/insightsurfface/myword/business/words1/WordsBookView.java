@@ -6,6 +6,7 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -73,7 +74,9 @@ public class WordsBookView extends RelativeLayout {
             public void onAnimationEnd(Animator animation) {
                 //切换显示
                 if (word.equals(wordTv.getText().toString())) {
-                    wordTv.setTextSize(24);
+                    wordTv.setTextSize(22);
+                    wordTv.setMaxLines(500);
+                    wordTv.setGravity(Gravity.LEFT);
                     if (TextUtils.isEmpty(translate)) {
                         //如果是空的 就通知查询单词
                         wordTv.setText(TRANSLATING);
@@ -85,6 +88,8 @@ public class WordsBookView extends RelativeLayout {
                     }
                 } else {
                     wordTv.setTextSize(38);
+                    wordTv.setMaxLines(1);
+                    wordTv.setGravity(Gravity.CENTER);
                     wordTv.setText(word);
                 }
             }

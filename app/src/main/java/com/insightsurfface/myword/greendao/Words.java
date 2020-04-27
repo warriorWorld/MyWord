@@ -20,6 +20,7 @@ public class Words {
     private int review_time;
     private long update_time;
     private long created_time;
+    private boolean is_dead;
     @ToOne(joinProperty = "fk_bookId")
     private WordsBook wordsBook;
     /**
@@ -33,10 +34,9 @@ public class Words {
     @Generated(hash = 1243070387)
     private transient WordsDao myDao;
 
-    @Generated(hash = 706625730)
-    public Words(Long id, Long fk_bookId, String word, int recognize_time,
-                 String translate, int review_time, long update_time,
-                 long created_time) {
+    @Generated(hash = 971161567)
+    public Words(Long id, Long fk_bookId, String word, int recognize_time, String translate,
+            int review_time, long update_time, long created_time, boolean is_dead) {
         this.id = id;
         this.fk_bookId = fk_bookId;
         this.word = word;
@@ -45,6 +45,7 @@ public class Words {
         this.review_time = review_time;
         this.update_time = update_time;
         this.created_time = created_time;
+        this.is_dead = is_dead;
     }
 
     @Generated(hash = 796553661)
@@ -186,6 +187,14 @@ public class Words {
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+
+    public boolean getIs_dead() {
+        return this.is_dead;
+    }
+
+    public void setIs_dead(boolean is_dead) {
+        this.is_dead = is_dead;
     }
 
     /** called by internal mechanisms, do not call yourself. */
