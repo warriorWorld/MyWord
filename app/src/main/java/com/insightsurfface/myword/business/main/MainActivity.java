@@ -16,6 +16,7 @@ import com.insightsurfface.myword.greendao.WordsBook;
 import com.insightsurfface.myword.listener.OnAddClickListener;
 import com.insightsurfface.myword.listener.OnRecycleItemClickListener;
 import com.insightsurfface.myword.listener.OnRecycleItemLongClickListener;
+import com.insightsurfface.myword.utils.ActivityPoor;
 import com.insightsurfface.myword.widget.dialog.AddBookDialog;
 import com.insightsurfface.myword.widget.dialog.NormalDialog;
 import com.insightsurfface.myword.widget.dialog.NormalDialogBuilder;
@@ -122,7 +123,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
                     @Override
                     public void onItemClick(int position) {
                         Intent intent = new Intent(MainActivity.this, WordsBookActivity.class);
-                        intent.putExtra("bookId", list.get(position).getId());
+                        intent.putExtra("bookId", mList.get(position).getId());
                         startActivity(intent);
                     }
                 });
@@ -152,6 +153,31 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void showQuitDialog() {
+        new NormalDialogBuilder(this)
+                .setTitle("退出生词本?")
+                .setOkText("退出")
+                .setCancelText("取消")
+                .setOnDialogClickListener(new NormalDialog.OnDialogClickListener() {
+                    @Override
+                    public void onOkClick() {
+                        ActivityPoor.finishAllActivity();
+                    }
+
+                    @Override
+                    public void onCancelClick() {
+
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        showQuitDialog();
     }
 
     @Override

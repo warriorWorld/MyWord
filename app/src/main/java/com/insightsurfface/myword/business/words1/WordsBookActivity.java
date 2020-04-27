@@ -146,6 +146,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                 killBtn.setVisibility(View.VISIBLE);
             }
             initViewPager();
+            text2Speech(wordsList.get(currentPosition).getWord());
             try {
                 topBarLeft.setText("总计:" + wordsList.size() + "个生词,当前位置:" + (currentPosition + 1));
             } catch (IndexOutOfBoundsException e) {

@@ -145,7 +145,7 @@ public class DbController {
      * 查询所有数据
      */
     public List<Words> querryWordsByBook(Long bookId) {
-        return (List<Words>) mWordsDao.queryBuilder().where(WordsDao.Properties.Fk_bookId.eq(bookId)).build().unique();
+        return  mWordsDao.queryBuilder().where(WordsDao.Properties.Fk_bookId.eq(bookId)).build().list();
     }
 
     /**
