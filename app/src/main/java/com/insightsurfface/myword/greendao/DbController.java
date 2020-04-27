@@ -137,8 +137,7 @@ public class DbController {
     }
 
     public void updateRecongnizeTime(Words word) {
-        word.setRecognize_time(word.getRecognize_time() + 1);
-        word.setUpdate_time(System.currentTimeMillis());
+        word.setRecognize_time(System.currentTimeMillis());
         mWordsDao.update(word);
     }
 
@@ -161,10 +160,10 @@ public class DbController {
      * 查询所有数据
      */
     public List<Words> querryWordsByBook(Long bookId) {
-//        long timeGap = System.currentTimeMillis();
-//        timeGap = timeGap - 3 * 60 * 60 * 1000;
+        long timeGap = System.currentTimeMillis();
+        timeGap = timeGap - 3 * 60 * 60 * 1000;
         return mWordsDao.queryBuilder().where(mWordsDao.queryBuilder().and(WordsDao.Properties.Fk_bookId.eq(bookId),
-                WordsDao.Properties.Is_dead.eq(false))).build().list();
+                WordsDao.Properties.Is_dead.eq(false), WordsDao.Properties.Recognize_time.lt(timeGap))).build().list();
     }
 
     /**

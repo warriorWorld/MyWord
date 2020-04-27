@@ -15,7 +15,7 @@ public class Words {
     private Long fk_bookId;//外键
     @Index(unique = true)//设置唯一性
     private String word;
-    private int recognize_time;
+    private long recognize_time;
     private String translate;
     private int review_time;
     private long update_time;
@@ -34,8 +34,8 @@ public class Words {
     @Generated(hash = 1243070387)
     private transient WordsDao myDao;
 
-    @Generated(hash = 971161567)
-    public Words(Long id, Long fk_bookId, String word, int recognize_time, String translate,
+    @Generated(hash = 1421871360)
+    public Words(Long id, Long fk_bookId, String word, long recognize_time, String translate,
             int review_time, long update_time, long created_time, boolean is_dead) {
         this.id = id;
         this.fk_bookId = fk_bookId;
@@ -74,14 +74,6 @@ public class Words {
 
     public void setWord(String word) {
         this.word = word;
-    }
-
-    public int getRecognize_time() {
-        return this.recognize_time;
-    }
-
-    public void setRecognize_time(int recognize_time) {
-        this.recognize_time = recognize_time;
     }
 
     public String getTranslate() {
@@ -195,6 +187,14 @@ public class Words {
 
     public void setIs_dead(boolean is_dead) {
         this.is_dead = is_dead;
+    }
+
+    public long getRecognize_time() {
+        return this.recognize_time;
+    }
+
+    public void setRecognize_time(long recognize_time) {
+        this.recognize_time = recognize_time;
     }
 
     /** called by internal mechanisms, do not call yourself. */
