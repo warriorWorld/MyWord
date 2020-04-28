@@ -1,6 +1,8 @@
 package com.insightsurfface.myword.business.setting;
 
 import android.os.Bundle;
+import android.text.InputType;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -11,8 +13,10 @@ import com.insightsurfface.myword.R;
 import com.insightsurfface.myword.base.BaseActivity;
 import com.insightsurfface.myword.config.ShareKeys;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
+import com.insightsurfface.myword.widget.dialog.EditDialog;
+import com.insightsurfface.myword.widget.dialog.EditDialogBuilder;
 
-public class SettingsActivity extends BaseActivity {
+public class SettingsActivity extends BaseActivity implements View.OnClickListener {
     private ImageView iconIv;
     private TextView versionTv;
     private CheckBox closeSoundCb;
@@ -26,6 +30,7 @@ public class SettingsActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initUI();
+        refreshUI();
     }
 
     /**
@@ -51,9 +56,6 @@ public class SettingsActivity extends BaseActivity {
                         (SettingsActivity.this, ShareKeys.CLOSE_SOUND_KEY, isChecked);
             }
         });
-        closeSoundCb.setChecked
-                (SharedPreferencesUtils.getBooleanSharedPreferencesData(SettingsActivity.this,
-                        ShareKeys.CLOSE_SOUND_KEY, false));
         clickCopyCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -61,13 +63,82 @@ public class SettingsActivity extends BaseActivity {
                         (SettingsActivity.this, ShareKeys.CLICK_COPY_KEY, isChecked);
             }
         });
+
+        reemergenceGapRl.setOnClickListener(this);
+        deleteWordRl.setOnClickListener(this);
+    }
+
+    private void refreshUI() {
+        closeSoundCb.setChecked
+                (SharedPreferencesUtils.getBooleanSharedPreferencesData(SettingsActivity.this,
+                        ShareKeys.CLOSE_SOUND_KEY, false));
         clickCopyCb.setChecked
                 (SharedPreferencesUtils.getBooleanSharedPreferencesData(SettingsActivity.this,
                         ShareKeys.CLICK_COPY_KEY, false));
+        int reemergenceGap = SharedPreferencesUtils.getIntSharedPreferencesData(this, ShareKeys.REEMERGENCE_GAP_KEY, 3);
+        reemergenceGapTv.setText("已选择\"认识\"的单词" + reemergenceGap + "小时后再次出现");
+        int deleteLimit = SharedPreferencesUtils.getIntSharedPreferencesData(this, ShareKeys.DELETE_LIMIT_KEY, 3);
+        deleteWordTv.setText("点击" + deleteLimit + "次\"认识\"后直接删除单词");
     }
 
     @Override
     protected int getLayoutId() {
         return R.layout.activity_settings;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.reemergence_gap_rl:
+                new EditDialogBuilder(SettingsActivity.this)
+                        .setTitle("设置已选择\"认识\"的单词再次出现的时间间隔")
+                        .setHint("请输入时间间隔,单位小时.")
+                        .setInputType(InputType.TYPE_CLASS_NUMBER)
+                        .setOkText("确定")
+                        .setCancelText("取消")
+                        .setTitleLeft(true)
+                        .setTitleBold(true)
+                        .setEditDialogListener(new EditDialog.OnEditDialogClickListener() {
+                            @Override
+                            public void onOkClick(String result) {
+                                SharedPreferencesUtils.setSharedPreferencesData
+                                        (SettingsActivity.this, ShareKeys.REEMERGENCE_GAP_KEY, Integer.valueOf(result));
+                                refreshUI();
+                            }
+
+                            @Override
+                            public void onCancelClick() {
+
+                            }
+                        })
+                        .create()
+                        .show();
+                break;
+            case R.id.delete_word_rl:
+                new EditDialogBuilder(SettingsActivity.this)
+                        .setTitle("设置点击多少次\"认识\"后直接删除单词")
+                        .setHint("请输入次数")
+                        .setInputType(InputType.TYPE_CLASS_NUMBER)
+                        .setOkText("确定")
+                        .setCancelText("取消")
+                        .setTitleLeft(true)
+                        .setTitleBold(true)
+                        .setEditDialogListener(new EditDialog.OnEditDialogClickListener() {
+                            @Override
+                            public void onOkClick(String result) {
+                                SharedPreferencesUtils.setSharedPreferencesData
+                                        (SettingsActivity.this, ShareKeys.DELETE_LIMIT_KEY, Integer.valueOf(result));
+                                refreshUI();
+                            }
+
+                            @Override
+                            public void onCancelClick() {
+
+                            }
+                        })
+                        .create()
+                        .show();
+                break;
+        }
     }
 }
