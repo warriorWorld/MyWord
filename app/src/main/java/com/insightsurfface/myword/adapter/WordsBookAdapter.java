@@ -5,14 +5,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.insightsurfface.myword.business.words1.WordsBookView;
+import com.insightsurfface.myword.enums.WordStatus;
 import com.insightsurfface.myword.greendao.Words;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.viewpager.widget.PagerAdapter;
 
 public class WordsBookAdapter extends PagerAdapter {
     private List<Words> wordsList;
+    private List<WordStatus> mWordStatusList;
     private Context context;
     private WordsBookView currentView;
     private WordsBookView.OnWordsBookViewListener onWordsBookViewListener;
@@ -25,6 +28,10 @@ public class WordsBookAdapter extends PagerAdapter {
 
     public void setList(List<Words> wordsList) {
         this.wordsList = wordsList;
+        mWordStatusList = new ArrayList<>();
+        for (int i = 0; i < wordsList.size(); i++) {
+            mWordStatusList.add(WordStatus.DEFAULT);
+        }
     }
 
     @Override
@@ -51,6 +58,17 @@ public class WordsBookAdapter extends PagerAdapter {
         v0 = new WordsBookView(context);
         v0.setWord(item.getWord());
         v0.setOnWordsBookViewListener(onWordsBookViewListener);
+        switch (mWordStatusList.get(position)) {
+            case DELETED:
+                v0.markDeleted();
+                break;
+            case RECONIZED:
+                v0.markReconized();
+                break;
+            case DEFAULT:
+                v0.hideMark();
+                break;
+        }
         container.addView(v0);
         return v0;
     }
@@ -74,6 +92,10 @@ public class WordsBookAdapter extends PagerAdapter {
     public void notifyDataSetChanged() {
         mChildCount = getCount();
         super.notifyDataSetChanged();
+    }
+
+    public List<WordStatus> getWordStatusList() {
+        return mWordStatusList;
     }
 
     //为解决删除后不刷新问题

@@ -12,6 +12,7 @@ import com.insightsurfface.myword.R;
 import com.insightsurfface.myword.adapter.WordsBookAdapter;
 import com.insightsurfface.myword.base.TTSActivity;
 import com.insightsurfface.myword.config.ShareKeys;
+import com.insightsurfface.myword.enums.WordStatus;
 import com.insightsurfface.myword.greendao.Words;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
 import com.insightsurfface.myword.utils.VibratorUtil;
@@ -195,6 +196,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         try {
             VibratorUtil.Vibrate(WordsBookActivity.this, 100);
             continuousKill();
+            adapter.getWordStatusList().set(currentPosition, WordStatus.DELETED);
             adapter.getCurrentView().markDeleted();
             toNextWord();
             if (wordsList.size() <= 0) {
@@ -220,6 +222,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     public void displayReconizeWord() {
         VibratorUtil.Vibrate(WordsBookActivity.this, 100);
         continuousKill();
+        adapter.getWordStatusList().set(currentPosition, WordStatus.RECONIZED);
         adapter.getCurrentView().markReconized();
         toNextWord();
     }

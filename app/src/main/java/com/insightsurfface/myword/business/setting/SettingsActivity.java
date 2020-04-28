@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.insightsurfface.myword.R;
 import com.insightsurfface.myword.base.BaseActivity;
 import com.insightsurfface.myword.config.ShareKeys;
+import com.insightsurfface.myword.utils.BaseParameterUtil;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
 import com.insightsurfface.myword.widget.dialog.EditDialog;
 import com.insightsurfface.myword.widget.dialog.EditDialogBuilder;
@@ -69,6 +70,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void refreshUI() {
+        versionTv.setText(BaseParameterUtil.getInstance().getAppVersionName(this));
         closeSoundCb.setChecked
                 (SharedPreferencesUtils.getBooleanSharedPreferencesData(SettingsActivity.this,
                         ShareKeys.CLOSE_SOUND_KEY, false));
