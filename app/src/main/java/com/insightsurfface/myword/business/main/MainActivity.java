@@ -36,6 +36,11 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         super.onCreate(savedInstanceState);
         initUI();
         setPresenter(new MainPresenter(this, this));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         mPresenter.getWordsTables();
     }
 
