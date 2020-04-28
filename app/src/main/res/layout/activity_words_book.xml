@@ -8,11 +8,11 @@
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/words_viewpager"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
         android:clipChildren="false"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/recognize_btn"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"></androidx.viewpager.widget.ViewPager>
@@ -59,7 +59,7 @@
         style="?android:attr/borderlessButtonStyle"
         android:layout_width="250dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="40dp"
         android:background="@drawable/rect_gray_c5"
         android:text="不认识"
         android:textColor="@color/colorPrimary"

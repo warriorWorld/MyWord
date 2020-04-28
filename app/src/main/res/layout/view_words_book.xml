@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginBottom="120dp">
+    android:layout_height="match_parent">
 
 
     <TextView
         android:id="@+id/word"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:layout_marginLeft="20dp"
         android:autoSizeMaxTextSize="50sp"
+        android:layout_marginTop="130dp"
+        android:layout_marginBottom="130dp"
         android:autoSizeMinTextSize="14sp"
         android:autoSizeStepGranularity="2sp"
         android:autoSizeTextType="uniform"

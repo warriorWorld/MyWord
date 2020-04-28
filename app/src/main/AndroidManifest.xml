@@ -27,6 +27,7 @@
         </activity>
         <activity android:name=".business.words.WordsActivity"></activity>
         <activity android:name=".business.words1.WordsBookActivity"></activity>
+        <activity android:name=".business.setting.SettingsActivity"></activity>
 
         <provider
             android:name=".db.WordsProvider"

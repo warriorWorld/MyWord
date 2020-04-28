@@ -11,7 +11,9 @@ import android.widget.TextView;
 import com.insightsurfface.myword.R;
 import com.insightsurfface.myword.adapter.WordsBookAdapter;
 import com.insightsurfface.myword.base.TTSActivity;
+import com.insightsurfface.myword.config.ShareKeys;
 import com.insightsurfface.myword.greendao.Words;
+import com.insightsurfface.myword.utils.SharedPreferencesUtils;
 import com.insightsurfface.myword.utils.VibratorUtil;
 
 import java.util.Collections;
@@ -85,6 +87,10 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
 
                 @Override
                 public void queryWord(String word) {
+                    if (SharedPreferencesUtils.getBooleanSharedPreferencesData
+                            (WordsBookActivity.this, ShareKeys.CLICK_COPY_KEY, false)) {
+                        clip.setText(word);
+                    }
                     mPresenter.translateWord(wordsList.get(currentPosition));
                 }
 

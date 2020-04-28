@@ -11,6 +11,7 @@ import android.view.animation.LayoutAnimationController;
 import com.insightsurfface.myword.R;
 import com.insightsurfface.myword.adapter.WordsTablesAdapter;
 import com.insightsurfface.myword.base.BaseActivity;
+import com.insightsurfface.myword.business.setting.SettingsActivity;
 import com.insightsurfface.myword.business.words1.WordsBookActivity;
 import com.insightsurfface.myword.greendao.WordsBook;
 import com.insightsurfface.myword.listener.OnAddClickListener;
@@ -58,7 +59,8 @@ public class MainActivity extends BaseActivity implements MainContract.View {
 
             @Override
             public void onRightClick() {
-
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
             }
 
             @Override
