@@ -97,7 +97,7 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
 
     @Override
     public void incognizanceWord(Words word) {
-        mView.toNextWord();
+        mView.displayIncogizanceWord();
     }
 
     @Override

@@ -39,6 +39,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     private TextView pageTv;
     private Button recognizeBtn;
     private Button incognizanceBtn;
+    private int continuousKill = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,6 +194,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     public void displayKillWord() {
         try {
             VibratorUtil.Vibrate(WordsBookActivity.this, 100);
+            continuousKill();
             adapter.getCurrentView().markDeleted();
             toNextWord();
             if (wordsList.size() <= 0) {
@@ -217,7 +219,22 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     @Override
     public void displayReconizeWord() {
         VibratorUtil.Vibrate(WordsBookActivity.this, 100);
+        continuousKill();
         adapter.getCurrentView().markReconized();
+        toNextWord();
+    }
+
+    private void continuousKill() {
+        continuousKill++;
+        if (continuousKill >= 5) {
+            text2Speech("PENTA KILL");
+            continuousKill = 0;
+        }
+    }
+
+    @Override
+    public void displayIncogizanceWord() {
+        continuousKill = 0;
         toNextWord();
     }
 

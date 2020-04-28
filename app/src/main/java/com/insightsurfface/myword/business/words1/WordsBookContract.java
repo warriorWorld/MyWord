@@ -31,6 +31,8 @@ public class WordsBookContract {
 
         void displayReconizeWord();
 
+        void displayIncogizanceWord();
+
         void toNextWord();
     }
 }
