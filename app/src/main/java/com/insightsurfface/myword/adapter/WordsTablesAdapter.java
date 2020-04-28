@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.insightsurfface.myword.R;
+import com.insightsurfface.myword.greendao.DbController;
 import com.insightsurfface.myword.greendao.WordsBook;
 import com.insightsurfface.myword.listener.OnAddClickListener;
 import com.insightsurfface.myword.listener.OnRecycleItemClickListener;
@@ -57,7 +58,8 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             if (null == item.getWords() || item.getWords().size() == 0) {
                 size = "0";
             } else {
-                size = item.getWords().size() + "";
+                size = DbController.getInstance(context.getApplicationContext()).querryWordsByBook
+                        (item.getId()).size() + "/" + item.getWords().size() + "";
             }
             vh.sizeTv.setText(size);
             vh.tableRl.setOnClickListener(new View.OnClickListener() {

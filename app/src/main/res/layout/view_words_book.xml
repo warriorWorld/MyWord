@@ -10,9 +10,9 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:layout_marginLeft="20dp"
-        android:autoSizeMaxTextSize="50sp"
         android:layout_marginTop="130dp"
         android:layout_marginBottom="130dp"
+        android:autoSizeMaxTextSize="50sp"
         android:autoSizeMinTextSize="14sp"
         android:autoSizeStepGranularity="2sp"
         android:autoSizeTextType="uniform"
@@ -25,4 +25,15 @@
         android:textColor="@color/main_text_color"
         android:textSize="38sp"
         android:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/mark_iv"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:visibility="gone"
+        android:layout_marginTop="150dp"
+        android:layout_marginRight="20dp"
+        android:elevation="5dp"
+        android:src="@drawable/ic_delete"></ImageView>
 </RelativeLayout>

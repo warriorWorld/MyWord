@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -25,6 +26,7 @@ public class WordsBookView extends RelativeLayout {
     private OnWordsBookViewListener onWordsBookViewListener;
     private int DURATION = 500;//动画时间
     private float rotationValue = 0f;
+    private ImageView markIv;
 
     public WordsBookView(Context context) {
         this(context, null);
@@ -38,6 +40,7 @@ public class WordsBookView extends RelativeLayout {
 
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.view_words_book, this);
+        markIv = findViewById(R.id.mark_iv);
         wordTv = (TextView) findViewById(R.id.word);
         wordTv.setOnClickListener(new OnClickListener() {
             @Override
@@ -109,6 +112,19 @@ public class WordsBookView extends RelativeLayout {
         set.start();
     }
 
+    public void hideMark() {
+        markIv.setVisibility(GONE);
+    }
+
+    public void markDeleted() {
+        markIv.setVisibility(VISIBLE);
+        markIv.setImageResource(R.drawable.ic_delete);
+    }
+
+    public void markReconized() {
+        markIv.setVisibility(VISIBLE);
+        markIv.setImageResource(R.drawable.ic_light_saber);
+    }
 
     public void setWord(String word) {
         this.word = word;

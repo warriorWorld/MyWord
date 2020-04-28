@@ -158,6 +158,17 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
             } else {
                 if (shuffle) {
                     Collections.shuffle(wordsList);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(500);
+                                text2Speech(wordsList.get(0).getWord());
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
                 }
                 emptyView.setVisibility(View.GONE);
                 killBtn.setVisibility(View.VISIBLE);
@@ -182,8 +193,8 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     public void displayKillWord() {
         try {
             VibratorUtil.Vibrate(WordsBookActivity.this, 100);
-            wordsList.remove(currentPosition);
-            displayWords(wordsList, false);
+            adapter.getCurrentView().markDeleted();
+            toNextWord();
             if (wordsList.size() <= 0) {
                 baseToast.showToast("PENTA KILL!!!");
                 finish();
@@ -205,7 +216,9 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
 
     @Override
     public void displayReconizeWord() {
-        displayKillWord();
+        VibratorUtil.Vibrate(WordsBookActivity.this, 100);
+        adapter.getCurrentView().markReconized();
+        toNextWord();
     }
 
     @Override
