@@ -5,10 +5,12 @@ import android.text.TextUtils;
 
 import com.insightsurfface.myword.base.BaseActivity;
 import com.insightsurfface.myword.bean.YoudaoResponse;
+import com.insightsurfface.myword.config.ShareKeys;
 import com.insightsurfface.myword.greendao.DbController;
 import com.insightsurfface.myword.greendao.Words;
 import com.insightsurfface.myword.okhttp.HttpService;
 import com.insightsurfface.myword.okhttp.RetrofitUtil;
+import com.insightsurfface.myword.utils.SharedPreferencesUtils;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
@@ -85,7 +87,12 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
     @Override
     public void recognizeWord(Words word) {
         DbController.getInstance(mContext.getApplicationContext()).updateRecongnizeTime(word);
-        mView.displayReconizeWord();
+        if (word.getRecognize_frequency() >= SharedPreferencesUtils.getIntSharedPreferencesData
+                (mContext, ShareKeys.DELETE_LIMIT_KEY, 3)) {
+            killWord(word);
+        } else {
+            mView.displayReconizeWord();
+        }
     }
 
     @Override

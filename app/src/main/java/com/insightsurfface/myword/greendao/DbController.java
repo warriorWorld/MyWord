@@ -5,6 +5,9 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
+import com.insightsurfface.myword.config.ShareKeys;
+import com.insightsurfface.myword.utils.SharedPreferencesUtils;
+
 import java.util.List;
 
 public class DbController {
@@ -138,6 +141,7 @@ public class DbController {
 
     public void updateRecongnizeTime(Words word) {
         word.setRecognize_time(System.currentTimeMillis());
+        word.setRecognize_frequency(word.getRecognize_frequency() + 1);
         mWordsDao.update(word);
     }
 
@@ -161,7 +165,7 @@ public class DbController {
      */
     public List<Words> querryWordsByBook(Long bookId) {
         long timeGap = System.currentTimeMillis();
-        timeGap = timeGap - 3 * 60 * 60 * 1000;
+        timeGap = timeGap - SharedPreferencesUtils.getIntSharedPreferencesData(context, ShareKeys.REEMERGENCE_GAP_KEY, 3) * 60 * 60 * 1000;
         return mWordsDao.queryBuilder().where(mWordsDao.queryBuilder().and(WordsDao.Properties.Fk_bookId.eq(bookId),
                 WordsDao.Properties.Is_dead.eq(false), WordsDao.Properties.Recognize_time.lt(timeGap))).build().list();
     }
