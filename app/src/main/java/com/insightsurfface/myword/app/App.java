@@ -28,7 +28,7 @@ public class App extends Application {
     }
 
     private void initYouDao() {
-        YouDaoApplication.init(this, "627fbbbd88df98c2");
+        YouDaoApplication.init(this, "700b929ed68fe5a0");
     }
 
     private void dealFileUriExposedException() {

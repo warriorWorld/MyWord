@@ -26,6 +26,7 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     private TextView deleteWordTv;
     private RelativeLayout reemergenceGapRl;
     private TextView reemergenceGapTv;
+    private CheckBox openPremiumCb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +65,17 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
                         (SettingsActivity.this, ShareKeys.CLICK_COPY_KEY, isChecked);
             }
         });
-
+        openPremiumCb = findViewById(R.id.open_premium_cb);
+        openPremiumCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferencesUtils.setSharedPreferencesData
+                        (SettingsActivity.this, ShareKeys.OPEN_PREMIUM_KEY, isChecked);
+            }
+        });
+        openPremiumCb.setChecked
+                (SharedPreferencesUtils.getBooleanSharedPreferencesData(this,
+                        ShareKeys.OPEN_PREMIUM_KEY, false));
         reemergenceGapRl.setOnClickListener(this);
         deleteWordRl.setOnClickListener(this);
     }

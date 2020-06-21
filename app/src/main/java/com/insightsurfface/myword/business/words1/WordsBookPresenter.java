@@ -10,7 +10,16 @@ import com.insightsurfface.myword.greendao.DbController;
 import com.insightsurfface.myword.greendao.Words;
 import com.insightsurfface.myword.okhttp.HttpService;
 import com.insightsurfface.myword.okhttp.RetrofitUtil;
+import com.insightsurfface.myword.utils.Logger;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
+import com.youdao.sdk.app.LanguageUtils;
+import com.youdao.sdk.ydonlinetranslate.Translator;
+import com.youdao.sdk.ydtranslate.Translate;
+import com.youdao.sdk.ydtranslate.TranslateErrorCode;
+import com.youdao.sdk.ydtranslate.TranslateListener;
+import com.youdao.sdk.ydtranslate.TranslateParameters;
+
+import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
@@ -19,6 +28,11 @@ import io.reactivex.schedulers.Schedulers;
 public class WordsBookPresenter implements WordsBookContract.Presenter {
     private Context mContext;
     private WordsBookContract.View mView;
+    private TranslateParameters tps = new TranslateParameters.Builder()
+            .source("MangaReader")
+            .from(LanguageUtils.getLangByName("中文"))
+            .to(LanguageUtils.getLangByName("英文"))
+            .build();
 
     public WordsBookPresenter(Context context, WordsBookContract.View view) {
         this.mContext = context;
@@ -39,49 +53,76 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
 
     @Override
     public void translateWord(final Words word) {
-        if (!TextUtils.isEmpty(word.getTranslate())) {
+        boolean usePremiumTranslate = SharedPreferencesUtils.getBooleanSharedPreferencesData
+                (mContext, ShareKeys.OPEN_PREMIUM_KEY, false);
+        if (!TextUtils.isEmpty(word.getTranslate()) && !usePremiumTranslate) {
             mView.displayTranslate(word.getTranslate());
             return;
         }
-        DisposableObserver<YoudaoResponse> observer = new DisposableObserver<YoudaoResponse>() {
-            @Override
-            public void onNext(YoudaoResponse result) {
-                if (null != result && result.getErrorCode() == 0) {
-                    YoudaoResponse.BasicBean item = result.getBasic();
-                    if (null != item) {
-                        String t = word.getWord() + ":\n";
-                        for (int i = 0; i < item.getExplains().size(); i++) {
-                            t = t + item.getExplains().get(i) + ";\n";
-                        }
-                        mView.displayTranslate(t);
-                        DbController.getInstance(mContext.getApplicationContext()).
-                                updateTranslate(word, t);
+        if (usePremiumTranslate) {
+            //使用SDK查词
+            Translator.getInstance(tps).lookup(word.getWord(), "requestId", new TranslateListener() {
+
+                @Override
+                public void onError(TranslateErrorCode code, String s) {
+                    Logger.d("error" + s);
+                    mView.displayMsg("没查到该词");
+                }
+
+                @Override
+                public void onResult(final Translate translate, final String s, String s1) {
+                    if (null != translate && null != translate.getExplains() && translate.getExplains().size() > 0) {
+                        mView.displayTranslate(translate);
                     } else {
                         mView.displayMsg("没查到该词");
-                        killWord(word);
                     }
-                } else {
-                    mView.displayMsg("网络连接失败");
                 }
-            }
 
-            @Override
-            public void onError(Throwable e) {
-                mView.displayMsg("error\n" + e.getMessage());
-            }
+                @Override
+                public void onResult(List<Translate> list, List<String> list1, List<TranslateErrorCode> list2, String s) {
+                    Logger.d(s);
+                }
+            });
+        } else {
+            DisposableObserver<YoudaoResponse> observer = new DisposableObserver<YoudaoResponse>() {
+                @Override
+                public void onNext(YoudaoResponse result) {
+                    if (null != result && result.getErrorCode() == 0) {
+                        YoudaoResponse.BasicBean item = result.getBasic();
+                        if (null != item) {
+                            String t = word.getWord() + ":\n";
+                            for (int i = 0; i < item.getExplains().size(); i++) {
+                                t = t + item.getExplains().get(i) + ";\n";
+                            }
+                            mView.displayTranslate(t);
+                            DbController.getInstance(mContext.getApplicationContext()).
+                                    updateTranslate(word, t);
+                        } else {
+                            mView.displayMsg("没查到该词");
+                            killWord(word);
+                        }
+                    } else {
+                        mView.displayMsg("网络连接失败");
+                    }
+                }
 
-            @Override
-            public void onComplete() {
+                @Override
+                public void onError(Throwable e) {
+                    mView.displayMsg("error\n" + e.getMessage());
+                }
 
-            }
-        };
+                @Override
+                public void onComplete() {
 
-        ((BaseActivity) mContext).mObserver.add(observer);
-        RetrofitUtil.getInstance().create(HttpService.class)
-                .translate(word.getWord())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(observer);
+                }
+            };
+            ((BaseActivity) mContext).mObserver.add(observer);
+            RetrofitUtil.getInstance().create(HttpService.class)
+                    .translate(word.getWord())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(observer);
+        }
     }
 
     @Override

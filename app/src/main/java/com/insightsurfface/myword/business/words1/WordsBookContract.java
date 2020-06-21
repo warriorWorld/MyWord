@@ -4,6 +4,7 @@ import com.insightsurfface.myword.base.BasePresenter;
 import com.insightsurfface.myword.base.BaseView;
 import com.insightsurfface.myword.bean.YoudaoResponse;
 import com.insightsurfface.myword.greendao.Words;
+import com.youdao.sdk.ydtranslate.Translate;
 
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class WordsBookContract {
         void displayWords(List<Words> list, boolean shuffle);
 
         void displayTranslate(String translate);
+
+        void displayTranslate(Translate translate);
 
         void displayKillWord();
 

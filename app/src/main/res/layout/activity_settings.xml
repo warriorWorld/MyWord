@@ -61,7 +61,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/click_copy_rl"
+        android:id="@+id/open_premium_rl"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginLeft="20dp"
@@ -74,6 +74,37 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/auto_sound_rl">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="使用收费版翻译"
+            android:textColor="@color/main_text_color"
+            android:textSize="14sp"></TextView>
+
+        <CheckBox
+            android:id="@+id/open_premium_cb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"></CheckBox>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/click_copy_rl"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/round5_white"
+        android:elevation="3dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/open_premium_rl">
 
         <TextView
             android:layout_width="wrap_content"

@@ -3,6 +3,7 @@ package com.insightsurfface.myword.business.words1;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.ClipboardManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -14,11 +15,18 @@ import com.insightsurfface.myword.base.TTSActivity;
 import com.insightsurfface.myword.config.ShareKeys;
 import com.insightsurfface.myword.enums.WordStatus;
 import com.insightsurfface.myword.greendao.Words;
+import com.insightsurfface.myword.listener.OnSpeakClickListener;
+import com.insightsurfface.myword.utils.AudioMgr;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
 import com.insightsurfface.myword.utils.VibratorUtil;
+import com.insightsurfface.myword.widget.dialog.TranslateResultDialog;
+import com.youdao.sdk.common.YouDaoLog;
+import com.youdao.sdk.ydtranslate.Translate;
+import com.youdao.sdk.ydtranslate.WebExplain;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.viewpager.widget.ViewPager;
 
@@ -189,6 +197,74 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     @Override
     public void displayTranslate(String translate) {
         adapter.getCurrentView().setTranslate(translate);
+    }
+
+    @Override
+    public void displayTranslate(final Translate translate) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                playVoice(translate.getUSSpeakUrl());
+                if (null != translate && null != translate.getExplains() && translate.getExplains().size() > 0) {
+                    String word = translate.getQuery();
+                    StringBuilder translateSb = new StringBuilder();
+                    translateSb.append(word).append(":\n");
+                    for (int i = 0; i < translate.getExplains().size(); i++) {
+                        translateSb.append(translate.getExplains().get(i)).append(";\n");
+                    }
+                    adapter.getCurrentView().setTranslate(translateSb.toString());
+                    if (null != translate.getWebExplains() && translate.getWebExplains().size() > 1) {
+                        StringBuilder webTranslateSb = new StringBuilder();
+                        webTranslateSb.append(translateSb);
+                        for (int i = 1; i < translate.getWebExplains().size(); i++) {
+                            WebExplain item = translate.getWebExplains().get(i);
+                            webTranslateSb.append(item.getKey()).append(":\n");
+                            for (int j = 0; j < item.getMeans().size(); j++) {
+                                webTranslateSb.append(item.getMeans().get(j)).append(";\n");
+                            }
+                            webTranslateSb.append("\n");
+                        }
+                        adapter.getCurrentView().setTranslate(webTranslateSb.toString());
+                    }
+                }
+            }
+        });
+    }
+
+    public synchronized void playVoice(String speakUrl) {
+        YouDaoLog.e(AudioMgr.PLAY_LOG + "TranslateDetailActivity click to playVoice speakUrl = " + speakUrl);
+        if (!TextUtils.isEmpty(speakUrl) && speakUrl.startsWith("http")) {
+            AudioMgr.startPlayVoice(speakUrl, new AudioMgr.SuccessListener() {
+                @Override
+                public void success() {
+                    YouDaoLog.e(AudioMgr.PLAY_LOG + "TranslateDetailActivity playVoice success");
+                }
+
+                @Override
+                public void playover() {
+                    YouDaoLog.e(AudioMgr.PLAY_LOG + "TranslateDetailActivity playover");
+                }
+            });
+        }
+    }
+
+    private void showVIPTranslateResultDialog(Translate translate) {
+        TranslateResultDialog translateResultDialog = new TranslateResultDialog(this);
+        translateResultDialog.setOnSpeakClickListener(new OnSpeakClickListener() {
+            @Override
+            public void onSpeakUSClick(String word) {
+                setLanguage(Locale.US);
+                text2Speech(word);
+            }
+
+            @Override
+            public void onSpeakUKClick(String word) {
+                setLanguage(Locale.UK);
+                text2Speech(word);
+            }
+        });
+        translateResultDialog.show();
+        translateResultDialog.setTranslate(translate);
     }
 
     @Override
