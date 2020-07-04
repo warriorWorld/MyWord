@@ -1,11 +1,14 @@
 package com.insightsurfface.myword.business.words1;
 
 import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.insightsurfface.myword.R;
+import com.insightsurfface.myword.utils.Logger;
 
 
 /**
@@ -22,11 +26,18 @@ import com.insightsurfface.myword.R;
 public class WordsBookView extends RelativeLayout {
     private Context context;
     private String word, translate, TRANSLATING = "查询中";
-    private TextView wordTv;
+    private TextView wordTv, translateTv;
     private OnWordsBookViewListener onWordsBookViewListener;
     private int DURATION = 500;//动画时间
     private float rotationValue = 0f;
     private ImageView markIv;
+    private Side mSide = Side.Front;
+    private AnimatorSet cardInAnimation;
+    private AnimatorSet cardOutAnimation;
+
+    enum Side {
+        Front, Back
+    }
 
     public WordsBookView(Context context) {
         this(context, null);
@@ -42,13 +53,21 @@ public class WordsBookView extends RelativeLayout {
         LayoutInflater.from(getContext()).inflate(R.layout.view_words_book, this);
         markIv = findViewById(R.id.mark_iv);
         wordTv = (TextView) findViewById(R.id.word);
+        translateTv = findViewById(R.id.translate_tv);
         wordTv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                playWordTvAnimation();
+//                playWordTvAnimation();
+                performCardFlip();
                 if (null != onWordsBookViewListener) {
                     onWordsBookViewListener.onWordClick(word);
                 }
+            }
+        });
+        translateTv.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performBackCardClick();
             }
         });
         wordTv.setOnLongClickListener(new OnLongClickListener() {
@@ -60,6 +79,71 @@ public class WordsBookView extends RelativeLayout {
                 return true;
             }
         });
+        initAnimation(context);
+    }
+
+    private void initAnimation(Context context) {
+        cardInAnimation = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.anim_card_in);
+        cardOutAnimation = (AnimatorSet) AnimatorInflater.loadAnimator(context, R.animator.anim_card_out);
+        cardOutAnimation.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                //切换显示
+                switch (mSide) {
+                    case Front:
+                        Logger.d("front");
+                        translateTv.setVisibility(GONE);
+                        wordTv.setTextSize(38);
+                        wordTv.setMaxLines(1);
+                        wordTv.setGravity(Gravity.CENTER);
+                        wordTv.setText(word);
+                        break;
+                    case Back:
+                        Logger.d("back");
+                        wordTv.setVisibility(GONE);
+                        translateTv.setTextSize(22);
+                        translateTv.setMaxLines(500);
+                        translateTv.setGravity(Gravity.LEFT);
+                        if (TextUtils.isEmpty(translate)) {
+                            //如果是空的 就通知查询单词
+                            translateTv.setText(TRANSLATING);
+                            if (null != onWordsBookViewListener) {
+                                onWordsBookViewListener.queryWord(word);
+                            }
+                        } else {
+                            translateTv.setText(translate);
+                        }
+                        break;
+                }
+            }
+        });
+    }
+
+    private void performCardFlip() {
+        Logger.d("performCardFlip");
+        if (mSide == Side.Back) {
+            return;
+        }
+        this.mSide = Side.Back;
+        translateTv.setVisibility(VISIBLE);
+        cardOutAnimation.setTarget(wordTv);
+        cardInAnimation.setTarget(translateTv);
+        cardOutAnimation.start();
+        cardInAnimation.start();
+    }
+
+    private void performBackCardClick() {
+        Logger.d("performBackCardClick");
+        if (mSide == Side.Front) {
+            return;
+        }
+        mSide = Side.Front;
+        wordTv.setVisibility(VISIBLE);
+        cardOutAnimation.setTarget(translateTv);
+        cardInAnimation.setTarget(wordTv);
+        cardOutAnimation.start();
+        cardInAnimation.start();
     }
 
     public void playWordTvAnimation() {
@@ -133,8 +217,8 @@ public class WordsBookView extends RelativeLayout {
 
     public void setTranslate(String translate) {
         this.translate = translate;
-        if (TRANSLATING.equals(wordTv.getText().toString())) {
-            wordTv.setText(translate);
+        if (TRANSLATING.equals(translateTv.getText().toString())) {
+            translateTv.setText(translate);
         }
     }
 
