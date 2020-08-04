@@ -29,6 +29,15 @@
         <activity android:name=".business.words1.WordsBookActivity"></activity>
         <activity android:name=".business.setting.SettingsActivity"></activity>
 
+        <service
+            android:name=".service.TranslateService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":remote">
+            <intent-filter>
+                <action android:name="android.intent.action.TranslateService" />
+            </intent-filter>
+        </service>
         <provider
             android:name=".db.WordsProvider"
             android:authorities="com.insightsurfface.myword"
