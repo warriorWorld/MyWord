@@ -1,12 +1,14 @@
 package com.insightsurfface.myword.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.insightsurfface.myword.R;
+import com.insightsurfface.myword.business.words.WordsActivity;
 import com.insightsurfface.myword.greendao.DbController;
 import com.insightsurfface.myword.greendao.WordsBook;
 import com.insightsurfface.myword.listener.OnAddClickListener;
@@ -25,6 +27,7 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     protected Context context;
     private final int TYPE_NORMAL = 0;
     private final int TYPE_END = 1;
+    private final int TYPE_LOCAL = 2;
     private List<WordsBook> list;
     private OnRecycleItemClickListener mOnRecycleItemClickListener;
     private OnRecycleItemClickListener mOnRefreshClickListener;
@@ -41,6 +44,9 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         if (viewType == TYPE_END) {
             View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_add_table, viewGroup, false);
             return new ListEndViewHolder(view);
+        } else if (viewType == TYPE_LOCAL) {
+            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_table_local, viewGroup, false);
+            return new NormalViewHolder(view);
         } else {
             View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_table, viewGroup, false);
             return new NormalViewHolder(view);
@@ -51,7 +57,8 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder viewHolder, final int position) {
         if (getItemViewType(position) == TYPE_NORMAL) {
-            WordsBook item = list.get(position);
+            final int realPos = position - 1;
+            WordsBook item = list.get(realPos);
             NormalViewHolder vh = (NormalViewHolder) viewHolder;
             vh.nameTv.setText(item.getName());
             String size;
@@ -66,7 +73,7 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 @Override
                 public void onClick(View v) {
                     if (null != mOnRecycleItemClickListener) {
-                        mOnRecycleItemClickListener.onItemClick(position);
+                        mOnRecycleItemClickListener.onItemClick(realPos);
                     }
                 }
             });
@@ -74,7 +81,7 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 @Override
                 public boolean onLongClick(View v) {
                     if (null != mOnRecycleItemLongClickListener) {
-                        mOnRecycleItemLongClickListener.onItemLongClick(position);
+                        mOnRecycleItemLongClickListener.onItemLongClick(realPos);
                     }
                     return true;
                 }
@@ -83,8 +90,17 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 @Override
                 public void onClick(View v) {
                     if (null != mOnRefreshClickListener) {
-                        mOnRefreshClickListener.onItemClick(position);
+                        mOnRefreshClickListener.onItemClick(realPos);
                     }
+                }
+            });
+        } else if (getItemViewType(position) == TYPE_LOCAL) {
+            NormalViewHolder vh = (NormalViewHolder) viewHolder;
+            vh.tableRl.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent=new Intent(context, WordsActivity.class);
+                    context.startActivity(intent);
                 }
             });
         } else {
@@ -103,9 +119,11 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public int getItemViewType(int position) {
         if (null == list || list.size() == 0) {
+            return TYPE_LOCAL;
+        } else if (position == list.size()+1) {
             return TYPE_END;
-        } else if (position == list.size()) {
-            return TYPE_END;
+        } else if (position == 0) {
+            return TYPE_LOCAL;
         } else {
             return TYPE_NORMAL;
         }
@@ -115,9 +133,9 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public int getItemCount() {
         if (null == list || list.size() == 0) {
-            return 1;
+            return 2;
         } else {
-            return list.size() + 1;
+            return list.size() + 2;
         }
     }
 

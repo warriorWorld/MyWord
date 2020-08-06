@@ -2,9 +2,13 @@ package com.insightsurfface.myword.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
+import android.view.WindowManager;
 
 import com.insightsurfface.myword.ITranslateAidlInterface;
 import com.insightsurfface.myword.aidl.ITranslateCallback;
@@ -13,11 +17,13 @@ import com.insightsurfface.myword.base.BaseActivity;
 import com.insightsurfface.myword.bean.YoudaoResponse;
 import com.insightsurfface.myword.config.Configure;
 import com.insightsurfface.myword.config.ShareKeys;
+import com.insightsurfface.myword.db.DbAdapter;
 import com.insightsurfface.myword.greendao.DbController;
 import com.insightsurfface.myword.okhttp.HttpService;
 import com.insightsurfface.myword.okhttp.RetrofitUtil;
 import com.insightsurfface.myword.utils.Logger;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
+import com.insightsurfface.myword.widget.dialog.TranslateResultDialog;
 import com.youdao.sdk.ydonlinetranslate.Translator;
 import com.youdao.sdk.ydtranslate.Translate;
 import com.youdao.sdk.ydtranslate.TranslateErrorCode;
@@ -37,11 +43,15 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class TranslateService extends Service {
     private CompositeDisposable mObserver = new CompositeDisposable();
+    private DbAdapter mDbAdapter;
+    private Handler mHandler;
+    private TranslateResultDialog mTranslateResultDialog;
     private ITranslateAidlInterface.Stub translateAidlInterface = new ITranslateAidlInterface.Stub() {
         @Override
-        public void translate(final String word, final ITranslateCallback callback) throws RemoteException {
+        public void translate(final String word, final boolean showResultDialog, final ITranslateCallback callback) throws RemoteException {
             boolean usePremiumTranslate = SharedPreferencesUtils.getBooleanSharedPreferencesData
                     (TranslateService.this, ShareKeys.OPEN_PREMIUM_KEY, false);
+            mDbAdapter.insertWordsBookTb(word, "");
             if (usePremiumTranslate) {
                 Translator.getInstance(Configure.TPS).lookup(word, "requestId", new TranslateListener() {
 
@@ -90,6 +100,9 @@ public class TranslateService extends Service {
                                 }
                                 wraper.setWebTranslate(webTranslateSb.toString());
                             }
+                            if (showResultDialog) {
+                                showTranslateDialog(wraper);
+                            }
                             try {
                                 callback.onResponse(wraper);
                             } catch (RemoteException e) {
@@ -123,6 +136,9 @@ public class TranslateService extends Service {
                                 }
                                 wraper.setQuery(word);
                                 wraper.setTranslate(t);
+                                if (showResultDialog) {
+                                    showTranslateDialog(wraper);
+                                }
                                 try {
                                     callback.onResponse(wraper);
                                 } catch (RemoteException e) {
@@ -167,6 +183,33 @@ public class TranslateService extends Service {
             }
         }
     };
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mDbAdapter = new DbAdapter(this);
+        mHandler = new Handler(Looper.getMainLooper());
+        mTranslateResultDialog = new TranslateResultDialog(this);
+    }
+
+    private void showTranslateDialog(final TranslateWraper wraper) {
+        Logger.d("handler" + mHandler + " ,dialog" + mTranslateResultDialog);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                /*8.0系统加强后台管理，禁止在其他应用和窗口弹提醒弹窗，如果要弹，必须使用TYPE_APPLICATION_OVERLAY，否则弹不出
+                 *需要SYSTEM_OVERLAY_WINDOW和SYSTEM_ALERT_WINDOW权限
+                 */
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    mTranslateResultDialog.getWindow().setType((WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY));
+                } else {
+                    mTranslateResultDialog.getWindow().setType((WindowManager.LayoutParams.TYPE_SYSTEM_ALERT));
+                }
+                mTranslateResultDialog.show();
+                mTranslateResultDialog.setTranslate(wraper);
+            }
+        });
+    }
 
     @Override
     public void onDestroy() {

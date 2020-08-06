@@ -16,10 +16,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.insightsurfface.myword.R;
+import com.insightsurfface.myword.aidl.TranslateWraper;
 import com.insightsurfface.myword.bean.YoudaoResponse;
 import com.insightsurfface.myword.config.ShareKeys;
 import com.insightsurfface.myword.listener.OnSpeakClickListener;
 import com.insightsurfface.myword.utils.AudioMgr;
+import com.insightsurfface.myword.utils.DisplayUtil;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
 import com.youdao.sdk.common.YouDaoLog;
 import com.youdao.sdk.ydtranslate.Translate;
@@ -41,8 +43,9 @@ public class TranslateResultDialog extends Dialog implements View.OnClickListene
     private TextView usPhoneticTv;
     private TextView translateTv;
     private TextView webTranslateTv;
+    private String ukSpeakUrl;
+    private String usSpeakUrl;
     private TextView okTv;
-    private Translate mTranslate;
     private Group webTranslateGroup;
     private Group ukGroup, usGroup;
     private OnSpeakClickListener onSpeakClickListener;
@@ -62,17 +65,8 @@ public class TranslateResultDialog extends Dialog implements View.OnClickListene
 
         Window window = this.getWindow();
         WindowManager.LayoutParams lp = window.getAttributes();
-        WindowManager wm = ((Activity) context).getWindowManager();
-        Display d = wm.getDefaultDisplay();
-        // lp.height = (int) (d.getHeight() * 0.4);
-        lp.width = (int) (d.getWidth() * 1);
-        // window.setGravity(Gravity.LEFT | Gravity.TOP);
+        lp.width = DisplayUtil.getScreenWidth(context);
         window.setGravity(Gravity.CENTER);
-//        window.getDecorView().setPadding(0, 0, 0, 0);
-        // lp.x = 100;
-        // lp.y = 100;
-        // lp.height = 30;
-        // lp.width = 20;
         window.setAttributes(lp);
     }
 
@@ -97,8 +91,39 @@ public class TranslateResultDialog extends Dialog implements View.OnClickListene
         okTv.setOnClickListener(this);
     }
 
+    public void setTranslate(TranslateWraper translate) {
+        ukSpeakUrl = translate.getUKSpeakUrl();
+        usSpeakUrl = translate.getUSSpeakUrl();
+        if (null != translate) {
+            word = translate.getQuery();
+            wordTv.setText(word);
+            if (!TextUtils.isEmpty(translate.getUKPhonetic())) {
+                ukPhoneticTv.setText("/" + translate.getUKPhonetic() + "/");
+                ukGroup.setVisibility(View.VISIBLE);
+            } else {
+                ukPhoneticTv.setText("");
+                ukGroup.setVisibility(View.GONE);
+            }
+            if (!TextUtils.isEmpty(translate.getUSPhonetic())) {
+                usPhoneticTv.setText("/" + translate.getUSPhonetic() + "/");
+                usGroup.setVisibility(View.VISIBLE);
+            } else {
+                usPhoneticTv.setText("");
+                usGroup.setVisibility(View.GONE);
+            }
+            translateTv.setText(translate.getTranslate());
+            if (!TextUtils.isEmpty(translate.getWebTranslate())) {
+                webTranslateGroup.setVisibility(View.VISIBLE);
+                webTranslateTv.setText(translate.getWebTranslate());
+            } else {
+                webTranslateGroup.setVisibility(View.GONE);
+            }
+        }
+    }
+
     public void setTranslate(Translate translate) {
-        mTranslate = translate;
+        ukSpeakUrl = translate.getUKSpeakUrl();
+        usSpeakUrl = translate.getUSSpeakUrl();
         if (null != translate && null != translate.getExplains() && translate.getExplains().size() > 0) {
             word = translate.getQuery();
             StringBuilder translateSb = new StringBuilder();
@@ -202,9 +227,9 @@ public class TranslateResultDialog extends Dialog implements View.OnClickListene
                 break;
             case R.id.uk_iv:
             case R.id.uk_phonetic_tv:
-                if (null != mTranslate && SharedPreferencesUtils.getBooleanSharedPreferencesData
+                if (!TextUtils.isEmpty(ukSpeakUrl) && SharedPreferencesUtils.getBooleanSharedPreferencesData
                         (context, ShareKeys.OPEN_PREMIUM_VOICE_KEY, false)) {
-                    playVoice(mTranslate.getUKSpeakUrl());
+                    playVoice(ukSpeakUrl);
                 } else {
                     if (null != onSpeakClickListener) {
                         onSpeakClickListener.onSpeakUKClick(word);
@@ -213,9 +238,9 @@ public class TranslateResultDialog extends Dialog implements View.OnClickListene
                 break;
             case R.id.us_iv:
             case R.id.us_phonetic_tv:
-                if (null != mTranslate && SharedPreferencesUtils.getBooleanSharedPreferencesData
+                if (!TextUtils.isEmpty(usSpeakUrl) && SharedPreferencesUtils.getBooleanSharedPreferencesData
                         (context, ShareKeys.OPEN_PREMIUM_VOICE_KEY, false)) {
-                    playVoice(mTranslate.getUSSpeakUrl());
+                    playVoice(usSpeakUrl);
                 } else {
                     if (null != onSpeakClickListener) {
                         onSpeakClickListener.onSpeakUSClick(word);

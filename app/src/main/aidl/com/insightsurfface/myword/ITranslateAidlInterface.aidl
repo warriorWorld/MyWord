@@ -8,5 +8,5 @@ interface ITranslateAidlInterface {
      * Demonstrates some basic types that you can use as parameters
      * and return values in AIDL.
      */
-    void translate(String word,in ITranslateCallback callback);
+    void translate(String word,boolean showResultDialog,in ITranslateCallback callback);
 }
