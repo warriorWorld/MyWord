@@ -2,11 +2,13 @@ package com.insightsurfface.myword.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
+import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
 import android.view.WindowManager;
 
@@ -21,8 +23,10 @@ import com.insightsurfface.myword.db.DbAdapter;
 import com.insightsurfface.myword.greendao.DbController;
 import com.insightsurfface.myword.okhttp.HttpService;
 import com.insightsurfface.myword.okhttp.RetrofitUtil;
+import com.insightsurfface.myword.utils.AudioMgr;
 import com.insightsurfface.myword.utils.Logger;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
+import com.insightsurfface.myword.utils.VolumeUtil;
 import com.insightsurfface.myword.widget.dialog.TranslateResultDialog;
 import com.youdao.sdk.ydonlinetranslate.Translator;
 import com.youdao.sdk.ydtranslate.Translate;
@@ -30,7 +34,9 @@ import com.youdao.sdk.ydtranslate.TranslateErrorCode;
 import com.youdao.sdk.ydtranslate.TranslateListener;
 import com.youdao.sdk.ydtranslate.WebExplain;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.annotation.Nullable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -41,7 +47,8 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * Created by acorn on 2020/8/4.
  */
-public class TranslateService extends Service {
+public class TranslateService extends Service implements TextToSpeech.OnInitListener {
+    private TextToSpeech tts;
     private CompositeDisposable mObserver = new CompositeDisposable();
     private DbAdapter mDbAdapter;
     private Handler mHandler;
@@ -189,6 +196,7 @@ public class TranslateService extends Service {
         super.onCreate();
         mDbAdapter = new DbAdapter(this);
         mHandler = new Handler(Looper.getMainLooper());
+        tts = new TextToSpeech(this, this);
         mTranslateResultDialog = new TranslateResultDialog(this);
     }
 
@@ -197,6 +205,14 @@ public class TranslateService extends Service {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
+                if (!SharedPreferencesUtils.getBooleanSharedPreferencesData
+                        (TranslateService.this, ShareKeys.CLOSE_SOUND_KEY, false)) {
+                    if (!TextUtils.isEmpty(wraper.getUKSpeakUrl())) {
+                        playVoice(wraper.getUKSpeakUrl());
+                    } else {
+                        text2Speech(wraper.getQuery(),true);
+                    }
+                }
                 /*8.0系统加强后台管理，禁止在其他应用和窗口弹提醒弹窗，如果要弹，必须使用TYPE_APPLICATION_OVERLAY，否则弹不出
                  *需要SYSTEM_OVERLAY_WINDOW和SYSTEM_ALERT_WINDOW权限
                  */
@@ -211,6 +227,51 @@ public class TranslateService extends Service {
         });
     }
 
+    protected void text2Speech(String text, boolean breakSpeaking) {
+        if (tts == null) {
+            return;
+        }
+        if (SharedPreferencesUtils.getBooleanSharedPreferencesData(this, ShareKeys.CLOSE_SOUND_KEY, false)) {
+            return;
+        }
+        if (tts.isSpeaking()) {
+            if (breakSpeaking) {
+                tts.stop();
+            } else {
+                return;
+            }
+        }
+        tts.setPitch(1f);// 设置音调，值越大声音越尖（女生），值越小则变成男声,1.0是常规
+        HashMap<String, String> myHashAlarm = new HashMap();
+        myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_STREAM,
+                String.valueOf(AudioManager.STREAM_ALARM));
+        myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_VOLUME,
+                VolumeUtil.getMusicVolumeRate(this) + "");
+
+        if (VolumeUtil.getHeadPhoneStatus(this)) {
+            AudioManager mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+//            mAudioManager.setStreamMute(AudioManager.STREAM_ALARM, true);
+            mAudioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, AudioManager.ADJUST_MUTE, 0);
+            mAudioManager.startBluetoothSco();
+        }
+        tts.speak(text,
+                TextToSpeech.QUEUE_FLUSH, myHashAlarm);
+    }
+
+    private synchronized void playVoice(String speakUrl) {
+        if (!TextUtils.isEmpty(speakUrl) && speakUrl.startsWith("http")) {
+            AudioMgr.startPlayVoice(speakUrl, new AudioMgr.SuccessListener() {
+                @Override
+                public void success() {
+                }
+
+                @Override
+                public void playover() {
+                }
+            });
+        }
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -221,5 +282,16 @@ public class TranslateService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return translateAidlInterface;
+    }
+
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            int result = tts.setLanguage(Locale.UK);
+            if (result == TextToSpeech.LANG_MISSING_DATA
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Logger.d("数据丢失或不支持");
+            }
+        }
     }
 }
