@@ -73,6 +73,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         killBtn = findViewById(R.id.kill_btn);
         pageTv = findViewById(R.id.page_tv);
         recognizeBtn = (Button) findViewById(R.id.recognize_btn);
+        recognizeBtn.setText(isWriteBook?"检查":"认识");
         incognizanceBtn = (Button) findViewById(R.id.incognizance_btn);
 
         recognizeBtn.setOnClickListener(this);
@@ -153,7 +154,19 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                 mPresenter.killWord(wordsList.get(currentPosition));
                 break;
             case R.id.recognize_btn:
-                mPresenter.recognizeWord(wordsList.get(currentPosition));
+                if (isWriteBook){
+                    if (TextUtils.isEmpty(adapter.getCurrentView().getText())){
+                        baseToast.showToast("word is empty");
+                        return;
+                    }
+                    if (adapter.getCurrentView().getText().equals(adapter.getCurrentView().getInput())){
+                        mPresenter.recognizeWord(wordsList.get(currentPosition));
+                    }else{
+                        mPresenter.incognizanceWord(wordsList.get(currentPosition));
+                    }
+                }else {
+                    mPresenter.recognizeWord(wordsList.get(currentPosition));
+                }
                 break;
             case R.id.incognizance_btn:
                 mPresenter.incognizanceWord(wordsList.get(currentPosition));

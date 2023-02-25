@@ -55,16 +55,6 @@ public class WriteWordsBookView extends RelativeLayout implements WordView {
         markIv = findViewById(R.id.mark_iv);
         wordEt = (EditText) findViewById(R.id.word);
         translateTv = findViewById(R.id.translate_tv);
-        wordEt.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                playWordTvAnimation();
-                performCardFlip();
-                if (null != onWordsBookViewListener) {
-                    onWordsBookViewListener.onWordClick(word);
-                }
-            }
-        });
         translateTv.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,7 +65,7 @@ public class WriteWordsBookView extends RelativeLayout implements WordView {
             @Override
             public boolean onLongClick(View v) {
                 if (null != onWordsBookViewListener) {
-                    onWordsBookViewListener.onWordLongClick(word);
+                    onWordsBookViewListener.onWordClick(word);
                 }
                 return true;
             }
@@ -96,15 +86,13 @@ public class WriteWordsBookView extends RelativeLayout implements WordView {
                         Logger.d("front");
                         translateTv.setVisibility(GONE);
                         wordEt.setTextSize(38);
-                        wordEt.setMaxLines(1);
                         wordEt.setGravity(Gravity.CENTER);
-                        wordEt.setText(word);
+                        wordEt.setText("");
                         break;
                     case Back:
                         Logger.d("back");
                         wordEt.setVisibility(GONE);
                         translateTv.setTextSize(22);
-                        translateTv.setMaxLines(500);
                         translateTv.setGravity(Gravity.LEFT);
                         if (TextUtils.isEmpty(translate)) {
                             //如果是空的 就通知查询单词
@@ -163,7 +151,6 @@ public class WriteWordsBookView extends RelativeLayout implements WordView {
                 //切换显示
                 if (word.equals(wordEt.getText().toString())) {
                     wordEt.setTextSize(22);
-                    wordEt.setMaxLines(500);
                     wordEt.setGravity(Gravity.LEFT);
                     if (TextUtils.isEmpty(translate)) {
                         //如果是空的 就通知查询单词
@@ -172,13 +159,12 @@ public class WriteWordsBookView extends RelativeLayout implements WordView {
                             onWordsBookViewListener.queryWord(word);
                         }
                     } else {
-                        wordEt.setText(translate);
+                        wordEt.setText("");
                     }
                 } else {
                     wordEt.setTextSize(38);
-                    wordEt.setMaxLines(1);
                     wordEt.setGravity(Gravity.CENTER);
-                    wordEt.setText(word);
+                    wordEt.setText("");
                 }
             }
 
@@ -213,9 +199,19 @@ public class WriteWordsBookView extends RelativeLayout implements WordView {
         markIv.setImageResource(R.drawable.ic_light_saber);
     }
 
+    @Override
+    public String getText() {
+        return word.toLowerCase();
+    }
+
+    @Override
+    public String getInput() {
+        return wordEt.getText().toString().toLowerCase();
+    }
+
     public void setWord(String word) {
         this.word = word;
-        wordEt.setText(word);
+        wordEt.setText("");
     }
 
     @Override

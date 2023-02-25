@@ -212,6 +212,16 @@ public class WordsBookView extends RelativeLayout implements WordView {
         markIv.setImageResource(R.drawable.ic_light_saber);
     }
 
+    @Override
+    public String getText() {
+        return wordTv.getText().toString();
+    }
+
+    @Override
+    public String getInput() {
+        return wordTv.getText().toString();
+    }
+
     public void setWord(String word) {
         this.word = word;
         wordTv.setText(word);

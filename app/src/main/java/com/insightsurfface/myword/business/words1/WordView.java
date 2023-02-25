@@ -9,4 +9,8 @@ public interface WordView {
     void markDeleted();
 
     void markReconized();
+
+    String getText();
+
+    String getInput();
 }
