@@ -8,10 +8,10 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -23,10 +23,11 @@ import com.insightsurfface.myword.utils.Logger;
 /**
  * Created by Administrator on 2016/4/4.
  */
-public class WordsBookView extends RelativeLayout implements WordView {
+public class WriteWordsBookView extends RelativeLayout implements WordView {
     private Context context;
     private String word, translate, TRANSLATING = "查询中";
-    private TextView wordTv, translateTv;
+    private EditText wordEt;
+    private TextView translateTv;
     private OnWordsBookViewListener onWordsBookViewListener;
     private int DURATION = 500;//动画时间
     private float rotationValue = 0f;
@@ -39,22 +40,22 @@ public class WordsBookView extends RelativeLayout implements WordView {
         Front, Back
     }
 
-    public WordsBookView(Context context) {
+    public WriteWordsBookView(Context context) {
         this(context, null);
     }
 
-    public WordsBookView(Context context, AttributeSet attrs) {
+    public WriteWordsBookView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
         init();
     }
 
     private void init() {
-        LayoutInflater.from(getContext()).inflate(R.layout.view_words_book, this);
+        LayoutInflater.from(getContext()).inflate(R.layout.view_write_words_book, this);
         markIv = findViewById(R.id.mark_iv);
-        wordTv = (TextView) findViewById(R.id.word);
+        wordEt = (EditText) findViewById(R.id.word);
         translateTv = findViewById(R.id.translate_tv);
-        wordTv.setOnClickListener(new OnClickListener() {
+        wordEt.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
 //                playWordTvAnimation();
@@ -70,7 +71,7 @@ public class WordsBookView extends RelativeLayout implements WordView {
                 performBackCardClick();
             }
         });
-        wordTv.setOnLongClickListener(new OnLongClickListener() {
+        wordEt.setOnLongClickListener(new OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 if (null != onWordsBookViewListener) {
@@ -94,14 +95,14 @@ public class WordsBookView extends RelativeLayout implements WordView {
                     case Front:
                         Logger.d("front");
                         translateTv.setVisibility(GONE);
-                        wordTv.setTextSize(38);
-                        wordTv.setMaxLines(1);
-                        wordTv.setGravity(Gravity.CENTER);
-                        wordTv.setText(word);
+                        wordEt.setTextSize(38);
+                        wordEt.setMaxLines(1);
+                        wordEt.setGravity(Gravity.CENTER);
+                        wordEt.setText(word);
                         break;
                     case Back:
                         Logger.d("back");
-                        wordTv.setVisibility(GONE);
+                        wordEt.setVisibility(GONE);
                         translateTv.setTextSize(22);
                         translateTv.setMaxLines(500);
                         translateTv.setGravity(Gravity.LEFT);
@@ -127,7 +128,7 @@ public class WordsBookView extends RelativeLayout implements WordView {
         }
         this.mSide = Side.Back;
         translateTv.setVisibility(VISIBLE);
-        cardOutAnimation.setTarget(wordTv);
+        cardOutAnimation.setTarget(wordEt);
         cardInAnimation.setTarget(translateTv);
         cardOutAnimation.start();
         cardInAnimation.start();
@@ -139,16 +140,16 @@ public class WordsBookView extends RelativeLayout implements WordView {
             return;
         }
         mSide = Side.Front;
-        wordTv.setVisibility(VISIBLE);
+        wordEt.setVisibility(VISIBLE);
         cardOutAnimation.setTarget(translateTv);
-        cardInAnimation.setTarget(wordTv);
+        cardInAnimation.setTarget(wordEt);
         cardOutAnimation.start();
         cardInAnimation.start();
     }
 
     public void playWordTvAnimation() {
         rotationValue = rotationValue + 360f;
-        ObjectAnimator wordTvAnimation = ObjectAnimator.ofFloat(wordTv, "rotationY", rotationValue);
+        ObjectAnimator wordTvAnimation = ObjectAnimator.ofFloat(wordEt, "rotationY", rotationValue);
         AnimatorSet set = new AnimatorSet();
         //属性动画监听类
         set.addListener(new Animator.AnimatorListener() {
@@ -160,24 +161,24 @@ public class WordsBookView extends RelativeLayout implements WordView {
             @Override
             public void onAnimationEnd(Animator animation) {
                 //切换显示
-                if (word.equals(wordTv.getText().toString())) {
-                    wordTv.setTextSize(22);
-                    wordTv.setMaxLines(500);
-                    wordTv.setGravity(Gravity.LEFT);
+                if (word.equals(wordEt.getText().toString())) {
+                    wordEt.setTextSize(22);
+                    wordEt.setMaxLines(500);
+                    wordEt.setGravity(Gravity.LEFT);
                     if (TextUtils.isEmpty(translate)) {
                         //如果是空的 就通知查询单词
-                        wordTv.setText(TRANSLATING);
+                        wordEt.setText(TRANSLATING);
                         if (null != onWordsBookViewListener) {
                             onWordsBookViewListener.queryWord(word);
                         }
                     } else {
-                        wordTv.setText(translate);
+                        wordEt.setText(translate);
                     }
                 } else {
-                    wordTv.setTextSize(38);
-                    wordTv.setMaxLines(1);
-                    wordTv.setGravity(Gravity.CENTER);
-                    wordTv.setText(word);
+                    wordEt.setTextSize(38);
+                    wordEt.setMaxLines(1);
+                    wordEt.setGravity(Gravity.CENTER);
+                    wordEt.setText(word);
                 }
             }
 
@@ -214,7 +215,7 @@ public class WordsBookView extends RelativeLayout implements WordView {
 
     public void setWord(String word) {
         this.word = word;
-        wordTv.setText(word);
+        wordEt.setText(word);
     }
 
     @Override

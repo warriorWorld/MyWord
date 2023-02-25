@@ -49,11 +49,13 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     private Button recognizeBtn;
     private Button incognizanceBtn;
     private int continuousKill = 0;
+    private boolean isWriteBook = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         clip = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        isWriteBook=getIntent().getBooleanExtra("isWriteBook",false);
         initUI();
         setPresenter(new WordsBookPresenter(this, this));
         bookId = getIntent().getLongExtra("bookId", -1);
@@ -89,7 +91,8 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         if (null == adapter) {
             adapter = new WordsBookAdapter(WordsBookActivity.this);
             vp.setOffscreenPageLimit(3);
-            adapter.setOnWordsBookViewListener(new WordsBookView.OnWordsBookViewListener() {
+            adapter.setWriteBook(isWriteBook);
+            adapter.setOnWordsBookViewListener(new OnWordsBookViewListener() {
                 @Override
                 public void onWordClick(String word) {
 

@@ -154,13 +154,10 @@ public class MainActivity extends BaseActivity implements MainContract.View {
                         adapter.setOnRecycleItemClickListener(new OnRecycleItemClickListener() {
                             @Override
                             public void onItemClick(int position) {
-                                if (SharedPreferencesUtils.getBooleanSharedPreferencesData(MainActivity.this, mList.get(position).getName() + ShareKeys.IS_WRITE_BOOK_KEY, false)) {
-
-                                } else {
-                                    Intent intent = new Intent(MainActivity.this, WordsBookActivity.class);
-                                    intent.putExtra("bookId", mList.get(position).getId());
-                                    startActivity(intent);
-                                }
+                                Intent intent = new Intent(MainActivity.this, WordsBookActivity.class);
+                                intent.putExtra("bookId", mList.get(position).getId());
+                                intent.putExtra("isWriteBook", SharedPreferencesUtils.getBooleanSharedPreferencesData(MainActivity.this, mList.get(position).getName() + ShareKeys.IS_WRITE_BOOK_KEY, false));
+                                startActivity(intent);
                             }
                         });
                         adapter.setOnAddClickListener(new OnAddClickListener() {
