@@ -13,11 +13,13 @@ import com.insightsurfface.myword.adapter.WordsTablesAdapter;
 import com.insightsurfface.myword.base.BaseActivity;
 import com.insightsurfface.myword.business.setting.SettingsActivity;
 import com.insightsurfface.myword.business.words1.WordsBookActivity;
+import com.insightsurfface.myword.config.ShareKeys;
 import com.insightsurfface.myword.greendao.WordsBook;
 import com.insightsurfface.myword.listener.OnAddClickListener;
 import com.insightsurfface.myword.listener.OnRecycleItemClickListener;
 import com.insightsurfface.myword.listener.OnRecycleItemLongClickListener;
 import com.insightsurfface.myword.utils.ActivityPoor;
+import com.insightsurfface.myword.utils.SharedPreferencesUtils;
 import com.insightsurfface.myword.widget.bar.TopBar;
 import com.insightsurfface.myword.widget.dialog.AddBookDialog;
 import com.insightsurfface.myword.widget.dialog.NormalDialog;
@@ -88,6 +90,8 @@ public class MainActivity extends BaseActivity implements MainContract.View {
                 WordsBook wordsBook = new WordsBook();
                 wordsBook.setName(name);
                 wordsBook.setUrl(url);
+                SharedPreferencesUtils.setSharedPreferencesData
+                        (MainActivity.this, name + ShareKeys.IS_WRITE_BOOK_KEY, isWriteBook);
                 mPresenter.insertBook(wordsBook);
             }
         });
@@ -150,9 +154,13 @@ public class MainActivity extends BaseActivity implements MainContract.View {
                         adapter.setOnRecycleItemClickListener(new OnRecycleItemClickListener() {
                             @Override
                             public void onItemClick(int position) {
-                                Intent intent = new Intent(MainActivity.this, WordsBookActivity.class);
-                                intent.putExtra("bookId", mList.get(position).getId());
-                                startActivity(intent);
+                                if (SharedPreferencesUtils.getBooleanSharedPreferencesData(MainActivity.this, mList.get(position).getName() + ShareKeys.IS_WRITE_BOOK_KEY, false)) {
+
+                                } else {
+                                    Intent intent = new Intent(MainActivity.this, WordsBookActivity.class);
+                                    intent.putExtra("bookId", mList.get(position).getId());
+                                    startActivity(intent);
+                                }
                             }
                         });
                         adapter.setOnAddClickListener(new OnAddClickListener() {

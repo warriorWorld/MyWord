@@ -13,4 +13,5 @@ public class ShareKeys {
     public static final String REEMERGENCE_GAP_KEY = "reemergence_gap_key";
     public static final String DELETE_LIMIT_KEY = "delete_limit_key";
     public static final String OPEN_PREMIUM_KEY = "open_premium_key";
+    public static final String IS_WRITE_BOOK_KEY="iswbk";
 }
