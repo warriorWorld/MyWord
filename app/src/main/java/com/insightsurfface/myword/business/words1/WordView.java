@@ -11,5 +11,6 @@ public interface WordView {
     void markReconized();
 
     void showWord();
+
     void performCardFlip();
 }
