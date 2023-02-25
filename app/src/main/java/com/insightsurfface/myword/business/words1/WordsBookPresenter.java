@@ -90,7 +90,7 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
                     if (null != result && result.getErrorCode() == 0) {
                         YoudaoResponse.BasicBean item = result.getBasic();
                         if (null != item) {
-                            String t = word.getWord() + ":\n";
+                            String t = "";
                             for (int i = 0; i < item.getExplains().size(); i++) {
                                 t = t + item.getExplains().get(i) + ";\n";
                             }

@@ -6,6 +6,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -18,6 +19,9 @@ import android.widget.TextView;
 
 import com.insightsurfface.myword.R;
 import com.insightsurfface.myword.utils.Logger;
+import com.insightsurfface.stylelibrary.keyboard.KeyBoardDialog;
+import com.insightsurfface.stylelibrary.listener.OnKeyboardChangeListener;
+import com.insightsurfface.stylelibrary.listener.OnKeyboardListener;
 
 
 /**
@@ -26,7 +30,7 @@ import com.insightsurfface.myword.utils.Logger;
 public class WriteWordsBookView extends RelativeLayout implements WordView {
     private Context context;
     private String word, translate, TRANSLATING = "查询中";
-    private EditText wordEt;
+    private TextView wordEt;
     private TextView translateTv;
     private OnWordsBookViewListener onWordsBookViewListener;
     private int DURATION = 500;//动画时间
@@ -53,7 +57,15 @@ public class WriteWordsBookView extends RelativeLayout implements WordView {
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.view_write_words_book, this);
         markIv = findViewById(R.id.mark_iv);
-        wordEt = (EditText) findViewById(R.id.word);
+        wordEt = (TextView) findViewById(R.id.word);
+        wordEt.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (null != onWordsBookViewListener) {
+                    onWordsBookViewListener.onWordClick(word);
+                }
+            }
+        });
         translateTv = findViewById(R.id.translate_tv);
         translateTv.setOnClickListener(new OnClickListener() {
             @Override
@@ -65,7 +77,7 @@ public class WriteWordsBookView extends RelativeLayout implements WordView {
             @Override
             public boolean onLongClick(View v) {
                 if (null != onWordsBookViewListener) {
-                    onWordsBookViewListener.onWordClick(word);
+                    onWordsBookViewListener.onWordLongClick(word);
                 }
                 return true;
             }
@@ -109,7 +121,8 @@ public class WriteWordsBookView extends RelativeLayout implements WordView {
         });
     }
 
-    private void performCardFlip() {
+    @Override
+    public void performCardFlip() {
         Logger.d("performCardFlip");
         if (mSide == Side.Back) {
             return;
@@ -199,19 +212,14 @@ public class WriteWordsBookView extends RelativeLayout implements WordView {
         markIv.setImageResource(R.drawable.ic_light_saber);
     }
 
-    @Override
-    public String getText() {
-        return word.toLowerCase();
-    }
-
-    @Override
-    public String getInput() {
-        return wordEt.getText().toString().toLowerCase();
-    }
-
     public void setWord(String word) {
         this.word = word;
         wordEt.setText("");
+    }
+
+    @Override
+    public void showWord() {
+        wordEt.setText(word);
     }
 
     @Override

@@ -10,7 +10,6 @@ public interface WordView {
 
     void markReconized();
 
-    String getText();
-
-    String getInput();
+    void showWord();
+    void performCardFlip();
 }

@@ -151,7 +151,6 @@ public class TranslateResultDialog extends Dialog implements View.OnClickListene
                 StringBuilder webTranslateSb = new StringBuilder();
                 for (int i = 1; i < translate.getWebExplains().size(); i++) {
                     WebExplain item = translate.getWebExplains().get(i);
-                    webTranslateSb.append(item.getKey()).append(":\n");
                     for (int j = 0; j < item.getMeans().size(); j++) {
                         webTranslateSb.append(item.getMeans().get(j)).append(";\n");
                     }

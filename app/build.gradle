@@ -7,7 +7,7 @@ android {
     buildToolsVersion "28.0.3"
     defaultConfig {
         applicationId "com.insightsurfface.myword"
-        minSdkVersion 14
+        minSdkVersion 17
         targetSdkVersion 28
         versionCode 2
         versionName "1.1"
@@ -57,4 +57,5 @@ dependencies {
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.2.0'
     //jsoup
     implementation 'org.jsoup:jsoup:1.10.3'
+    implementation 'com.github.warriorWorld:StyleLibrary:1.1.7'
 }

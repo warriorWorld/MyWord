@@ -99,7 +99,6 @@ public class TranslateService extends Service implements TextToSpeech.OnInitList
                                 StringBuilder webTranslateSb = new StringBuilder();
                                 for (int i = 1; i < translate.getWebExplains().size(); i++) {
                                     WebExplain item = translate.getWebExplains().get(i);
-                                    webTranslateSb.append(item.getKey()).append(":\n");
                                     for (int j = 0; j < item.getMeans().size(); j++) {
                                         webTranslateSb.append(item.getMeans().get(j)).append(";\n");
                                     }
@@ -137,7 +136,7 @@ public class TranslateService extends Service implements TextToSpeech.OnInitList
                             YoudaoResponse.BasicBean item = result.getBasic();
                             if (null != item) {
                                 TranslateWraper wraper = new TranslateWraper();
-                                String t = word + ":\n";
+                                String t = "";
                                 for (int i = 0; i < item.getExplains().size(); i++) {
                                     t = t + item.getExplains().get(i) + ";\n";
                                 }

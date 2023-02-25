@@ -20,6 +20,9 @@ import com.insightsurfface.myword.utils.AudioMgr;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
 import com.insightsurfface.myword.utils.VibratorUtil;
 import com.insightsurfface.myword.widget.dialog.TranslateResultDialog;
+import com.insightsurfface.stylelibrary.keyboard.KeyBoardDialog;
+import com.insightsurfface.stylelibrary.listener.OnKeyboardChangeListener;
+import com.insightsurfface.stylelibrary.listener.OnKeyboardListener;
 import com.youdao.sdk.common.YouDaoLog;
 import com.youdao.sdk.ydtranslate.Translate;
 import com.youdao.sdk.ydtranslate.WebExplain;
@@ -55,7 +58,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         clip = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        isWriteBook=getIntent().getBooleanExtra("isWriteBook",false);
+        isWriteBook = getIntent().getBooleanExtra("isWriteBook", false);
         initUI();
         setPresenter(new WordsBookPresenter(this, this));
         bookId = getIntent().getLongExtra("bookId", -1);
@@ -73,7 +76,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         killBtn = findViewById(R.id.kill_btn);
         pageTv = findViewById(R.id.page_tv);
         recognizeBtn = (Button) findViewById(R.id.recognize_btn);
-        recognizeBtn.setText(isWriteBook?"检查":"认识");
+        recognizeBtn.setText(isWriteBook ? "发音" : "认识");
         incognizanceBtn = (Button) findViewById(R.id.incognizance_btn);
 
         recognizeBtn.setOnClickListener(this);
@@ -96,7 +99,9 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
             adapter.setOnWordsBookViewListener(new OnWordsBookViewListener() {
                 @Override
                 public void onWordClick(String word) {
-
+                    if (isWriteBook) {
+                        showKeyboardDialog();
+                    }
                 }
 
                 @Override
@@ -111,7 +116,11 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                 @Override
                 public void onWordLongClick(String word) {
                     //长按才调用这个
-                    clip.setText(word);
+                    if (isWriteBook){
+                        adapter.getCurrentView().performCardFlip();
+                    }else{
+                        clip.setText(word);
+                    }
                 }
             });
             adapter.setList(wordsList);
@@ -141,6 +150,39 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         }
     }
 
+    private void showKeyboardDialog() {
+        final KeyBoardDialog dialog = new KeyBoardDialog(this);
+        dialog.setOnKeyboardChangeListener(new OnKeyboardChangeListener() {
+            @Override
+            public void onChange(String res) {
+            }
+
+            @Override
+            public void onFinish(String res) {
+                if (TextUtils.isEmpty(res)) {
+                    baseToast.showToast("word is empty");
+                    return;
+                }
+                if (res.equals(wordsList.get(currentPosition).getWord())) {
+                    adapter.getCurrentView().showWord();
+                    mPresenter.recognizeWord(wordsList.get(currentPosition));
+                } else {
+                    mPresenter.incognizanceWord(wordsList.get(currentPosition));
+                }
+            }
+        });
+        dialog.setOnKeyboardListener(new OnKeyboardListener() {
+            @Override
+            public void onOptionsClick() {
+            }
+
+            @Override
+            public void onQuestionClick() {
+            }
+        });
+        dialog.show();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -154,17 +196,9 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                 mPresenter.killWord(wordsList.get(currentPosition));
                 break;
             case R.id.recognize_btn:
-                if (isWriteBook){
-                    if (TextUtils.isEmpty(adapter.getCurrentView().getText())){
-                        baseToast.showToast("word is empty");
-                        return;
-                    }
-                    if (adapter.getCurrentView().getText().equals(adapter.getCurrentView().getInput())){
-                        mPresenter.recognizeWord(wordsList.get(currentPosition));
-                    }else{
-                        mPresenter.incognizanceWord(wordsList.get(currentPosition));
-                    }
-                }else {
+                if (isWriteBook) {
+                    text2Speech(wordsList.get(currentPosition).getWord());
+                } else {
                     mPresenter.recognizeWord(wordsList.get(currentPosition));
                 }
                 break;
@@ -224,7 +258,6 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                 if (null != translate && null != translate.getExplains() && translate.getExplains().size() > 0) {
                     String word = translate.getQuery();
                     StringBuilder translateSb = new StringBuilder();
-                    translateSb.append(word).append(":\n");
                     for (int i = 0; i < translate.getExplains().size(); i++) {
                         translateSb.append(translate.getExplains().get(i)).append(";\n");
                     }
@@ -234,7 +267,6 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                         webTranslateSb.append(translateSb);
                         for (int i = 1; i < translate.getWebExplains().size(); i++) {
                             WebExplain item = translate.getWebExplains().get(i);
-                            webTranslateSb.append(item.getKey()).append(":\n");
                             for (int j = 0; j < item.getMeans().size(); j++) {
                                 webTranslateSb.append(item.getMeans().get(j)).append(";\n");
                             }
