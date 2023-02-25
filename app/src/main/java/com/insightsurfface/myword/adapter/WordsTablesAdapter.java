@@ -118,9 +118,11 @@ public class WordsTablesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemViewType(int position) {
-        if (null == list || list.size() == 0) {
-            return TYPE_LOCAL;
-        } else if (position == list.size()+1) {
+        int size=0;
+        if(null!=list){
+            size=list.size();
+        }
+       if (position == size+1) {
             return TYPE_END;
         } else if (position == 0) {
             return TYPE_LOCAL;

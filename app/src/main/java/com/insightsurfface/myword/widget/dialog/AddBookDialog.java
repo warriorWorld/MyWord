@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.insightsurfface.myword.R;
@@ -27,6 +28,7 @@ public class AddBookDialog extends Dialog {
     private Button okBtn;
     private Button cancelBtn;
     private EditText nameEt, urlEt;
+    private CheckBox writeBookCb;
 
     private OnAddBookListener mOnAddClickListener;
 
@@ -67,6 +69,7 @@ public class AddBookDialog extends Dialog {
         cancelBtn = (Button) findViewById(R.id.cancel_btn);
         nameEt = findViewById(R.id.name_et);
         urlEt = findViewById(R.id.url_et);
+        writeBookCb = findViewById(R.id.write_book_cb);
 
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,7 +87,7 @@ public class AddBookDialog extends Dialog {
                     return;
                 }
                 if (null != mOnAddClickListener) {
-                    mOnAddClickListener.onOkClick(name, url);
+                    mOnAddClickListener.onOkClick(writeBookCb.isChecked(),name, url);
                 }
             }
         });
@@ -95,6 +98,6 @@ public class AddBookDialog extends Dialog {
     }
 
     public interface OnAddBookListener {
-        void onOkClick(String name, String url);
+        void onOkClick(boolean isWriteBook, String name, String url);
     }
 }

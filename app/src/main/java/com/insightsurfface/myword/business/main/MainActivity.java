@@ -84,7 +84,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         AddBookDialog dialog = new AddBookDialog(this);
         dialog.setOnAddClickListener(new AddBookDialog.OnAddBookListener() {
             @Override
-            public void onOkClick(String name, String url) {
+            public void onOkClick(boolean isWriteBook, String name, String url) {
                 WordsBook wordsBook = new WordsBook();
                 wordsBook.setName(name);
                 wordsBook.setUrl(url);
