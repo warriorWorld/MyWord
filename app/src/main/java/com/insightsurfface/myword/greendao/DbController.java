@@ -170,6 +170,17 @@ public class DbController {
                 WordsDao.Properties.Is_dead.eq(false), WordsDao.Properties.Recognize_time.lt(timeGap))).build().list();
     }
 
+    public void resetStudyProgress(Long bookId) {
+        List<Words> list = mWordsDao.queryBuilder().where(WordsDao.Properties.Fk_bookId.eq(bookId)).build().list();
+        for (Words word : list) {
+            //强制超时
+            word.setRecognize_time(System.currentTimeMillis() - SharedPreferencesUtils.getIntSharedPreferencesData(context, ShareKeys.REEMERGENCE_GAP_KEY, 3) * 60 * 61 * 1000);
+            word.setRecognize_frequency(0);
+            word.setIs_dead(false);
+            mWordsDao.update(word);
+        }
+    }
+
     /**
      * 删除数据
      */

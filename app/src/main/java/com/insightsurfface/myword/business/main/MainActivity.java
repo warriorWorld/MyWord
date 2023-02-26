@@ -14,14 +14,17 @@ import com.insightsurfface.myword.base.BaseActivity;
 import com.insightsurfface.myword.business.setting.SettingsActivity;
 import com.insightsurfface.myword.business.words1.WordsBookActivity;
 import com.insightsurfface.myword.config.ShareKeys;
+import com.insightsurfface.myword.greendao.DbController;
 import com.insightsurfface.myword.greendao.WordsBook;
 import com.insightsurfface.myword.listener.OnAddClickListener;
+import com.insightsurfface.myword.listener.OnListDialogEventListener;
 import com.insightsurfface.myword.listener.OnRecycleItemClickListener;
 import com.insightsurfface.myword.listener.OnRecycleItemLongClickListener;
 import com.insightsurfface.myword.utils.ActivityPoor;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
 import com.insightsurfface.myword.widget.bar.TopBar;
 import com.insightsurfface.myword.widget.dialog.AddBookDialog;
+import com.insightsurfface.myword.widget.dialog.ListDialog;
 import com.insightsurfface.myword.widget.dialog.NormalDialog;
 import com.insightsurfface.myword.widget.dialog.NormalDialogBuilder;
 
@@ -32,6 +35,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     private WordsTablesAdapter adapter;
     private MainContract.Presenter mPresenter;
     private List<WordsBook> mList;
+    private String[] selectOptions = {"重置学习进度", "删除单词本"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,7 +173,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
                         adapter.setOnRecycleItemLongClickListener(new OnRecycleItemLongClickListener() {
                             @Override
                             public void onItemLongClick(int position) {
-                                showDeleteDialog(mList.get(position).getId());
+                                showOptionsDialog(position);
                             }
                         });
                         adapter.setOnRefreshClickListener(new OnRecycleItemClickListener() {
@@ -188,6 +192,35 @@ public class MainActivity extends BaseActivity implements MainContract.View {
                 }
             }
         });
+    }
+
+    private void showOptionsDialog(int position) {
+        ListDialog listDialog = new ListDialog(this);
+        listDialog.setOnListDialogEventListener(new OnListDialogEventListener() {
+            @Override
+            public void onItemClick(String selectedRes, String selectedCodeRes) {
+
+            }
+
+            @Override
+            public void onItemClick(String selectedRes) {
+
+            }
+
+            @Override
+            public void onItemClick(int position) {
+                switch (position) {
+                    case 0:
+                        DbController.getInstance(MainActivity.this).resetStudyProgress(mList.get(position).getId());
+                        break;
+                    case 1:
+                        showDeleteDialog(mList.get(position).getId());
+                        break;
+                }
+            }
+        });
+        listDialog.show();
+        listDialog.setOptionsList(selectOptions);
     }
 
     @Override

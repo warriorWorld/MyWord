@@ -13,7 +13,7 @@
         android:layout_marginTop="130dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="130dp"
-        android:autoSizeMaxTextSize="50sp"
+        android:autoSizeMaxTextSize="28sp"
         android:autoSizeMinTextSize="14sp"
         android:autoSizeStepGranularity="2sp"
         android:autoSizeTextType="uniform"
@@ -23,7 +23,7 @@
         android:padding="26dp"
         android:text="Stranger"
         android:textColor="@color/main_text_color"
-        android:textSize="38sp"
+        android:textSize="24sp"
         android:visibility="visible" />
 
     <TextView

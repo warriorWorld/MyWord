@@ -164,7 +164,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                     baseToast.showToast("word is empty");
                     return;
                 }
-                if (res.equals(wordsList.get(currentPosition).getWord())) {
+                if (res.equalsIgnoreCase(wordsList.get(currentPosition).getWord())) {
                     adapter.getCurrentView().showWord();
                     mPresenter.recognizeWord(wordsList.get(currentPosition));
                 } else {

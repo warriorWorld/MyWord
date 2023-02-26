@@ -99,7 +99,7 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
                                     updateTranslate(word, t);
                         } else {
                             mView.displayMsg("没查到该词");
-                            killWord(word);
+//                            killWord(word);
                         }
                     } else {
                         mView.displayMsg("网络连接失败");
