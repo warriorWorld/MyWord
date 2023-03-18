@@ -211,7 +211,13 @@ public class MainActivity extends BaseActivity implements MainContract.View {
             public void onItemClick(int position) {
                 switch (position) {
                     case 0:
-                        DbController.getInstance(MainActivity.this).resetStudyProgress(mList.get(position).getId());
+                        WordsBook oldWb = mList.get(position);
+                        mPresenter.deleteBook(oldWb.getId());
+                        WordsBook wordsBook = new WordsBook();
+                        wordsBook.setId(oldWb.getId()+5);
+                        wordsBook.setName(oldWb.getName());
+                        wordsBook.setUrl(oldWb.getUrl());
+                        mPresenter.insertBook(wordsBook);
                         break;
                     case 1:
                         showDeleteDialog(mList.get(position).getId());

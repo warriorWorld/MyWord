@@ -83,7 +83,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         recognizeBtn.setOnClickListener(this);
         incognizanceBtn.setOnClickListener(this);
         killBtn.setOnClickListener(this);
-        baseTopBar.setTitle("生词本");
+        baseTopBar.setTitle("");
     }
 
     @Override
