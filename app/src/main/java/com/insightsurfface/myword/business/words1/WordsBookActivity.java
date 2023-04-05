@@ -78,7 +78,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         recognizeBtn = (Button) findViewById(R.id.recognize_btn);
         recognizeBtn.setText(isWriteBook ? "发音" : "认识");
         incognizanceBtn = (Button) findViewById(R.id.incognizance_btn);
-        incognizanceBtn.setText(isWriteBook?"显示":"不认识");
+        incognizanceBtn.setText(isWriteBook ? "显示" : "不认识");
 
         recognizeBtn.setOnClickListener(this);
         incognizanceBtn.setOnClickListener(this);
@@ -117,9 +117,9 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                 @Override
                 public void onWordLongClick(String word) {
                     //长按才调用这个
-                    if (isWriteBook){
+                    if (isWriteBook) {
                         adapter.getCurrentView().performCardFlip();
-                    }else{
+                    } else {
                         clip.setText(word);
                     }
                 }
@@ -164,7 +164,9 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                     baseToast.showToast("word is empty");
                     return;
                 }
-                if (res.equalsIgnoreCase(wordsList.get(currentPosition).getWord())) {
+                if (res.equalsIgnoreCase(wordsList.get(currentPosition).getWord()
+                        .replaceAll("'", " ")
+                        .replaceAll("-", " "))) {
                     adapter.getCurrentView().showWord();
                     mPresenter.recognizeWord(wordsList.get(currentPosition));
                 } else {
@@ -204,9 +206,9 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                 }
                 break;
             case R.id.incognizance_btn:
-                if (isWriteBook){
+                if (isWriteBook) {
                     adapter.getCurrentView().showWord();
-                }else {
+                } else {
                     mPresenter.incognizanceWord(wordsList.get(currentPosition));
                 }
                 break;
