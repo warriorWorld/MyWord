@@ -83,7 +83,7 @@ public class AddBookDialog extends Dialog {
                 dismiss();
                 String name = nameEt.getText().toString().replaceAll(" ", "");
                 String url = urlEt.getText().toString().replaceAll(" ", "");
-                if (TextUtils.isEmpty(name) || TextUtils.isEmpty(url)) {
+                if (TextUtils.isEmpty(name) ) {
                     return;
                 }
                 if (null != mOnAddClickListener) {

@@ -14,7 +14,11 @@ public class MainContract {
 
         void deleteBook(Long id);
 
+        void resetBook(Long id);
+
         void updateBook(WordsBook book);
+
+        void updateBookManually(final WordsBook book, List<String> result);
     }
 
     interface View extends BaseView<Presenter> {

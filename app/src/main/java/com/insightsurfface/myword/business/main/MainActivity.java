@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 
@@ -24,10 +25,13 @@ import com.insightsurfface.myword.utils.ActivityPoor;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
 import com.insightsurfface.myword.widget.bar.TopBar;
 import com.insightsurfface.myword.widget.dialog.AddBookDialog;
+import com.insightsurfface.myword.widget.dialog.EditDialog;
+import com.insightsurfface.myword.widget.dialog.EditDialogBuilder;
 import com.insightsurfface.myword.widget.dialog.ListDialog;
 import com.insightsurfface.myword.widget.dialog.NormalDialog;
 import com.insightsurfface.myword.widget.dialog.NormalDialogBuilder;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends BaseActivity implements MainContract.View {
@@ -35,7 +39,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     private WordsTablesAdapter adapter;
     private MainContract.Presenter mPresenter;
     private List<WordsBook> mList;
-    private String[] selectOptions = {"重置学习进度", "删除单词本"};
+    private String[] selectOptions = {"重置学习进度", "手动添加单词", "删除单词本"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,7 +198,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         });
     }
 
-    private void showOptionsDialog(int position) {
+    private void showOptionsDialog(final int bookPosition) {
         ListDialog listDialog = new ListDialog(this);
         listDialog.setOnListDialogEventListener(new OnListDialogEventListener() {
             @Override
@@ -211,22 +215,51 @@ public class MainActivity extends BaseActivity implements MainContract.View {
             public void onItemClick(int position) {
                 switch (position) {
                     case 0:
-                        WordsBook oldWb = mList.get(position);
-                        mPresenter.deleteBook(oldWb.getId());
-                        WordsBook wordsBook = new WordsBook();
-                        wordsBook.setId(oldWb.getId()+5);
-                        wordsBook.setName(oldWb.getName());
-                        wordsBook.setUrl(oldWb.getUrl());
-                        mPresenter.insertBook(wordsBook);
+                        mPresenter.resetBook(mList.get(bookPosition).getId());
                         break;
                     case 1:
-                        showDeleteDialog(mList.get(position).getId());
+                        showAddWordsDialog(mList.get(bookPosition));
+                        break;
+                    case 2:
+                        showDeleteDialog(mList.get(bookPosition).getId());
                         break;
                 }
             }
         });
         listDialog.show();
         listDialog.setOptionsList(selectOptions);
+    }
+
+    private void showAddWordsDialog(final WordsBook wordsBook) {
+        EditDialogBuilder builder = new EditDialogBuilder(this);
+        builder.setCancelText("cancel")
+                .setTitle("add new words")
+                .setHint("use , to seperate words")
+                .setOkText("confirm")
+                .setTitleBold(true)
+                .setEditDialogListener(new EditDialog.OnEditDialogClickListener() {
+                    @Override
+                    public void onOkClick(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            baseToast.showToast("empty!");
+                        } else {
+                            String[] words = result.split(",");
+
+                            if (words.length > 0) {
+                                mPresenter.updateBookManually(wordsBook, Arrays.asList(words));
+                            } else {
+                                baseToast.showToast("empty!");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelClick() {
+
+                    }
+                })
+                .create()
+                .show();
     }
 
     @Override

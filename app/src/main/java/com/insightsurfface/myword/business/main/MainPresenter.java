@@ -40,6 +40,12 @@ public class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
+    public void resetBook(Long id) {
+        DbController.getInstance(mContext.getApplicationContext()).resetStudyProgress(id);
+        getWordsTables();
+    }
+
+    @Override
     public void updateBook(final WordsBook book) {
         new WordsCrawler().getWords(book.getUrl(), new OnResultCallBack<List<String>>() {
             @Override
@@ -73,8 +79,35 @@ public class MainPresenter implements MainContract.Presenter {
         });
     }
 
+    @Override
+    public void updateBookManually(final WordsBook book, List<String> result) {
+        if (null == book.getWords() || book.getWords().size() == 0) {
+            for (String item : result) {
+                insertOneWord(book, item);
+            }
+        } else {
+            for (String item : result) {
+                boolean isContains = false;
+                for (Words word : book.getWords()) {
+                    if (item.equals(word.getWord())) {
+                        isContains = true;
+                        break;
+                    }
+                }
+                if (!isContains) {
+                    insertOneWord(book, item);
+                }
+            }
+        }
+        mView.displayMsg("更新完成");
+        getWordsTables();
+    }
+
     private void insertOneWord(WordsBook book, String item) {
         Words word = new Words();
+        item = item.replaceAll("\n", "");
+        item = item.replaceAll("\r", "");
+        item = item.trim();
         word.setWord(item);
         word.setCreated_time(System.currentTimeMillis());
         word.setUpdate_time(System.currentTimeMillis());
