@@ -16,4 +16,5 @@ public class ShareKeys {
     public static final String IS_WRITE_BOOK_KEY="iswbk";
     public static final String IS_MASTER = "is_master";
     public static final String IS_CREATOR = "is_creator";
+    public static final String FILTER_KEY = "filter_key";
 }

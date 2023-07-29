@@ -2,6 +2,7 @@ package com.insightsurfface.myword.business.setting;
 
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -81,6 +82,13 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
         reemergenceGapRl.setOnClickListener(this);
         deleteWordRl.setOnClickListener(this);
         findViewById(R.id.lock_rl).setOnClickListener(this);
+        findViewById(R.id.lock_rl).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showFilterDialog();
+                return true;
+            }
+        });
     }
 
     private void refreshUI() {
@@ -128,6 +136,31 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
 
             }
         });
+    }
+
+    private void showFilterDialog() {
+        EditDialogBuilder editDialogBuilder = new EditDialogBuilder(this);
+        editDialogBuilder.setTitle("set filters")
+                .setTitleBold(true)
+                .setOkText("confirm")
+                .setCancelText("cancel")
+                .setHint("seperte by ,")
+                .setEditDialogListener(new EditDialog.OnEditDialogClickListener() {
+                    @Override
+                    public void onOkClick(String result) {
+                        SharedPreferencesUtils.setSharedPreferencesData
+                                (SettingsActivity.this, ShareKeys.FILTER_KEY, result);
+                    }
+
+                    @Override
+                    public void onCancelClick() {
+
+                    }
+                })
+                .setInputText(TextUtils.isEmpty(SharedPreferencesUtils.getSharedPreferencesData(this, ShareKeys.FILTER_KEY)) ?
+                        "" : SharedPreferencesUtils.getSharedPreferencesData(this, ShareKeys.FILTER_KEY))
+                .create()
+                .show();
     }
 
     @Override
