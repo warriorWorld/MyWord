@@ -12,4 +12,8 @@ public class PermissionUtil {
     public static boolean isCreator(Context context) {
         return SharedPreferencesUtils.getBooleanSharedPreferencesData(context, ShareKeys.IS_CREATOR, false);
     }
+
+    public static boolean isImageSwitched(Context context) {
+        return SharedPreferencesUtils.getBooleanSharedPreferencesData(context, ShareKeys.IMAGE_SWITCH, false);
+    }
 }

@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 
@@ -14,6 +15,7 @@ import com.insightsurfface.myword.adapter.WordsTablesAdapter;
 import com.insightsurfface.myword.base.BaseActivity;
 import com.insightsurfface.myword.business.setting.SettingsActivity;
 import com.insightsurfface.myword.business.words1.WordsBookActivity;
+import com.insightsurfface.myword.config.Configure;
 import com.insightsurfface.myword.config.ShareKeys;
 import com.insightsurfface.myword.greendao.DbController;
 import com.insightsurfface.myword.greendao.WordsBook;
@@ -22,6 +24,7 @@ import com.insightsurfface.myword.listener.OnListDialogEventListener;
 import com.insightsurfface.myword.listener.OnRecycleItemClickListener;
 import com.insightsurfface.myword.listener.OnRecycleItemLongClickListener;
 import com.insightsurfface.myword.utils.ActivityPoor;
+import com.insightsurfface.myword.utils.PermissionUtil;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
 import com.insightsurfface.myword.widget.bar.TopBar;
 import com.insightsurfface.myword.widget.dialog.AddBookDialog;
@@ -63,6 +66,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         wordsTablesRcv.setHasFixedSize(true);
         LayoutAnimationController controller = new LayoutAnimationController(AnimationUtils.loadAnimation(this, R.anim.recycler_load));
         wordsTablesRcv.setLayoutAnimation(controller);
+        final View switchMark = findViewById(R.id.switch_mark);
         baseTopBar.hideLeftButton();
         baseTopBar.setTitle(getString(R.string.app_name));
         baseTopBar.setRightBackground(R.drawable.ic_settings);
@@ -80,9 +84,12 @@ public class MainActivity extends BaseActivity implements MainContract.View {
 
             @Override
             public void onTitleClick() {
-
+                boolean imageSwitch = PermissionUtil.isImageSwitched(MainActivity.this);
+                SharedPreferencesUtils.setSharedPreferencesData(MainActivity.this, ShareKeys.IMAGE_SWITCH, !imageSwitch);
+                switchMark.setVisibility(PermissionUtil.isImageSwitched(MainActivity.this) ? View.VISIBLE : View.GONE);
             }
         });
+        switchMark.setVisibility(PermissionUtil.isImageSwitched(MainActivity.this) ? View.VISIBLE : View.GONE);
     }
 
     @Override

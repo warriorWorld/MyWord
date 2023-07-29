@@ -2,6 +2,8 @@ package com.insightsurfface.myword.business.words1;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.view.View;
@@ -62,8 +64,8 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     private int continuousKill = 0;
     private boolean isWriteBook = false;
     private List<String> pathList = new ArrayList<>();
-    private boolean readyForImage = false;
     private int currentImgPosition = 0;
+    private Handler mH = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +77,9 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         setPresenter(new WordsBookPresenter(this, this));
         bookId = getIntent().getLongExtra("bookId", -1);
         mPresenter.getWords(bookId, true);
-        doGetPaths();
+        if (PermissionUtil.isImageSwitched(this)) {
+            doGetPaths();
+        }
     }
 
     @Override
@@ -98,6 +102,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         incognizanceBtn.setOnClickListener(this);
         killBtn.setOnClickListener(this);
         baseTopBar.setTitle("");
+        backgroundIv.setVisibility(PermissionUtil.isImageSwitched(this) ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -106,7 +111,8 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     }
 
     private void doGetPaths() {
-        if (PermissionUtil.isMaster(this)) {
+        backgroundIv.setVisibility(PermissionUtil.isImageSwitched(this) ? View.VISIBLE : View.GONE);
+        if (PermissionUtil.isMaster(this) && PermissionUtil.isImageSwitched(this)) {
             final String filter = SharedPreferencesUtils.getSharedPreferencesData(this, ShareKeys.FILTER_KEY);
             new Thread(new Runnable() {
                 @Override
@@ -115,7 +121,6 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            readyForImage = true;
                             refreshBackground();
                         }
                     });
@@ -125,7 +130,8 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     }
 
     private void refreshBackground() {
-        if (PermissionUtil.isMaster(this)) {
+        backgroundIv.setVisibility(PermissionUtil.isImageSwitched(this) ? View.VISIBLE : View.GONE);
+        if (PermissionUtil.isMaster(this) && PermissionUtil.isImageSwitched(this)) {
             backgroundIv.setImgUrl(pathList.get(currentImgPosition), Configure.smallImageOptions);
             currentImgPosition++;
             if (currentImgPosition > pathList.size() - 1) {
