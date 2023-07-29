@@ -185,4 +185,36 @@
             android:layout_centerVertical="true"
             android:src="@drawable/forward"></ImageView>
     </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/lock_rl"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/round5_white"
+        android:elevation="3dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/reemergence_gap_rl">
+
+        <TextView
+            android:id="@+id/reemergence_gap_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="锁"
+            android:textColor="@color/main_text_color"
+            android:textSize="14sp"></TextView>
+
+        <ImageView
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/forward"></ImageView>
+    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -22,4 +22,6 @@ public class Configure {
             .from(LanguageUtils.getLangByName("中文"))
             .to(LanguageUtils.getLangByName("英文"))
             .build();
+    // 3DES加密key
+    final public static String key = "iq2szojof6x1ckgejwe52urw";
 }
