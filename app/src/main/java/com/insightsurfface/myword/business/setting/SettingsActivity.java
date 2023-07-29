@@ -14,6 +14,7 @@ import com.insightsurfface.myword.R;
 import com.insightsurfface.myword.base.BaseActivity;
 import com.insightsurfface.myword.config.ShareKeys;
 import com.insightsurfface.myword.utils.BaseParameterUtil;
+import com.insightsurfface.myword.utils.PermissionUtil;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
 import com.insightsurfface.myword.widget.dialog.EditDialog;
 import com.insightsurfface.myword.widget.dialog.EditDialogBuilder;
@@ -139,28 +140,30 @@ public class SettingsActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void showFilterDialog() {
-        EditDialogBuilder editDialogBuilder = new EditDialogBuilder(this);
-        editDialogBuilder.setTitle("set filters")
-                .setTitleBold(true)
-                .setOkText("confirm")
-                .setCancelText("cancel")
-                .setHint("seperte by ,")
-                .setEditDialogListener(new EditDialog.OnEditDialogClickListener() {
-                    @Override
-                    public void onOkClick(String result) {
-                        SharedPreferencesUtils.setSharedPreferencesData
-                                (SettingsActivity.this, ShareKeys.FILTER_KEY, result);
-                    }
+        if (PermissionUtil.isMaster(this)) {
+            EditDialogBuilder editDialogBuilder = new EditDialogBuilder(this);
+            editDialogBuilder.setTitle("set filters")
+                    .setTitleBold(true)
+                    .setOkText("confirm")
+                    .setCancelText("cancel")
+                    .setHint("seperte by ,")
+                    .setEditDialogListener(new EditDialog.OnEditDialogClickListener() {
+                        @Override
+                        public void onOkClick(String result) {
+                            SharedPreferencesUtils.setSharedPreferencesData
+                                    (SettingsActivity.this, ShareKeys.FILTER_KEY, result);
+                        }
 
-                    @Override
-                    public void onCancelClick() {
+                        @Override
+                        public void onCancelClick() {
 
-                    }
-                })
-                .setInputText(TextUtils.isEmpty(SharedPreferencesUtils.getSharedPreferencesData(this, ShareKeys.FILTER_KEY)) ?
-                        "" : SharedPreferencesUtils.getSharedPreferencesData(this, ShareKeys.FILTER_KEY))
-                .create()
-                .show();
+                        }
+                    })
+                    .setInputText(TextUtils.isEmpty(SharedPreferencesUtils.getSharedPreferencesData(this, ShareKeys.FILTER_KEY)) ?
+                            "" : SharedPreferencesUtils.getSharedPreferencesData(this, ShareKeys.FILTER_KEY))
+                    .create()
+                    .show();
+        }
     }
 
     @Override

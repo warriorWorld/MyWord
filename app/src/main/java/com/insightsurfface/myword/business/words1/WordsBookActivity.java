@@ -20,6 +20,7 @@ import com.insightsurfface.myword.greendao.Words;
 import com.insightsurfface.myword.listener.OnSpeakClickListener;
 import com.insightsurfface.myword.utils.AudioMgr;
 import com.insightsurfface.myword.utils.FileSpider;
+import com.insightsurfface.myword.utils.PermissionUtil;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
 import com.insightsurfface.myword.utils.VibratorUtil;
 import com.insightsurfface.myword.widget.dialog.TranslateResultDialog;
@@ -105,27 +106,31 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     }
 
     private void doGetPaths() {
-        final String filter = SharedPreferencesUtils.getSharedPreferencesData(this, ShareKeys.FILTER_KEY);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                pathList = FileSpider.getInstance().getFilteredImages(WordsBookActivity.this, filter);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        readyForImage = true;
-                        refreshBackground();
-                    }
-                });
-            }
-        }).start();
+        if (PermissionUtil.isMaster(this)) {
+            final String filter = SharedPreferencesUtils.getSharedPreferencesData(this, ShareKeys.FILTER_KEY);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    pathList = FileSpider.getInstance().getFilteredImages(WordsBookActivity.this, filter);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            readyForImage = true;
+                            refreshBackground();
+                        }
+                    });
+                }
+            }).start();
+        }
     }
 
     private void refreshBackground() {
-        backgroundIv.setImgUrl(pathList.get(currentImgPosition), Configure.smallImageOptions);
-        currentImgPosition++;
-        if (currentImgPosition>pathList.size()-1){
-            currentImgPosition=0;
+        if (PermissionUtil.isMaster(this)) {
+            backgroundIv.setImgUrl(pathList.get(currentImgPosition), Configure.smallImageOptions);
+            currentImgPosition++;
+            if (currentImgPosition > pathList.size() - 1) {
+                currentImgPosition = 0;
+            }
         }
     }
 
