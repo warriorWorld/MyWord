@@ -217,6 +217,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                         .replaceAll("-", " "))) {
                     adapter.getCurrentView().showWord();
                     mPresenter.recognizeWord(wordsList.get(currentPosition));
+                    refreshBackground();
                 } else {
                     mPresenter.incognizanceWord(wordsList.get(currentPosition));
                 }
@@ -252,8 +253,8 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                     text2Speech(wordsList.get(currentPosition).getWord());
                 } else {
                     mPresenter.recognizeWord(wordsList.get(currentPosition));
+                    refreshBackground();
                 }
-                refreshBackground();
                 break;
             case R.id.incognizance_btn:
                 if (isWriteBook) {
