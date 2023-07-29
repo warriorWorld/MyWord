@@ -7,26 +7,32 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.insightsurfface.myword.R;
 import com.insightsurfface.myword.adapter.WordsBookAdapter;
 import com.insightsurfface.myword.base.TTSActivity;
+import com.insightsurfface.myword.config.Configure;
 import com.insightsurfface.myword.config.ShareKeys;
 import com.insightsurfface.myword.enums.WordStatus;
 import com.insightsurfface.myword.greendao.Words;
 import com.insightsurfface.myword.listener.OnSpeakClickListener;
 import com.insightsurfface.myword.utils.AudioMgr;
+import com.insightsurfface.myword.utils.FileSpider;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
 import com.insightsurfface.myword.utils.VibratorUtil;
 import com.insightsurfface.myword.widget.dialog.TranslateResultDialog;
+import com.insightsurfface.myword.widget.imageview.WrapHeightImageView;
 import com.insightsurfface.stylelibrary.keyboard.KeyBoardDialog;
 import com.insightsurfface.stylelibrary.listener.OnKeyboardChangeListener;
 import com.insightsurfface.stylelibrary.listener.OnKeyboardListener;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.youdao.sdk.common.YouDaoLog;
 import com.youdao.sdk.ydtranslate.Translate;
 import com.youdao.sdk.ydtranslate.WebExplain;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -51,8 +57,12 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     private TextView pageTv;
     private Button recognizeBtn;
     private Button incognizanceBtn;
+    private WrapHeightImageView backgroundIv;
     private int continuousKill = 0;
     private boolean isWriteBook = false;
+    private List<String> pathList = new ArrayList<>();
+    private boolean readyForImage = false;
+    private int currentImgPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +70,11 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         clip = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         isWriteBook = getIntent().getBooleanExtra("isWriteBook", false);
         initUI();
+        hideBaseTopBar();
         setPresenter(new WordsBookPresenter(this, this));
         bookId = getIntent().getLongExtra("bookId", -1);
         mPresenter.getWords(bookId, true);
+        doGetPaths();
     }
 
     @Override
@@ -78,6 +90,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         recognizeBtn = (Button) findViewById(R.id.recognize_btn);
         recognizeBtn.setText(isWriteBook ? "发音" : "认识");
         incognizanceBtn = (Button) findViewById(R.id.incognizance_btn);
+        backgroundIv = findViewById(R.id.background_iv);
         incognizanceBtn.setText(isWriteBook ? "显示" : "不认识");
 
         recognizeBtn.setOnClickListener(this);
@@ -91,6 +104,30 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         return R.layout.activity_words_book;
     }
 
+    private void doGetPaths() {
+        final String filter = SharedPreferencesUtils.getSharedPreferencesData(this, ShareKeys.FILTER_KEY);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                pathList = FileSpider.getInstance().getFilteredImages(WordsBookActivity.this, filter);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        readyForImage = true;
+                        refreshBackground();
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private void refreshBackground() {
+        backgroundIv.setImgUrl(pathList.get(currentImgPosition), Configure.smallImageOptions);
+        currentImgPosition++;
+        if (currentImgPosition>pathList.size()-1){
+            currentImgPosition=0;
+        }
+    }
 
     private void initViewPager() {
         if (null == adapter) {
@@ -197,6 +234,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         switch (v.getId()) {
             case R.id.kill_btn:
                 mPresenter.killWord(wordsList.get(currentPosition));
+                refreshBackground();
                 break;
             case R.id.recognize_btn:
                 if (isWriteBook) {
@@ -204,6 +242,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
                 } else {
                     mPresenter.recognizeWord(wordsList.get(currentPosition));
                 }
+                refreshBackground();
                 break;
             case R.id.incognizance_btn:
                 if (isWriteBook) {
