@@ -24,6 +24,7 @@ import com.insightsurfface.myword.utils.AudioMgr;
 import com.insightsurfface.myword.utils.FileSpider;
 import com.insightsurfface.myword.utils.PermissionUtil;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
+import com.insightsurfface.myword.utils.StringFormer;
 import com.insightsurfface.myword.utils.VibratorUtil;
 import com.insightsurfface.myword.widget.dialog.TranslateResultDialog;
 import com.insightsurfface.myword.widget.imageview.WrapHeightImageView;
@@ -311,26 +312,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
             @Override
             public void run() {
                 playVoice(translate.getUSSpeakUrl());
-                if (null != translate && null != translate.getExplains() && translate.getExplains().size() > 0) {
-                    String word = translate.getQuery();
-                    StringBuilder translateSb = new StringBuilder();
-                    for (int i = 0; i < translate.getExplains().size(); i++) {
-                        translateSb.append(translate.getExplains().get(i)).append(";\n");
-                    }
-                    adapter.getCurrentView().setTranslate(translateSb.toString());
-                    if (null != translate.getWebExplains() && translate.getWebExplains().size() > 1) {
-                        StringBuilder webTranslateSb = new StringBuilder();
-                        webTranslateSb.append(translateSb);
-                        for (int i = 1; i < translate.getWebExplains().size(); i++) {
-                            WebExplain item = translate.getWebExplains().get(i);
-                            for (int j = 0; j < item.getMeans().size(); j++) {
-                                webTranslateSb.append(item.getMeans().get(j)).append(";\n");
-                            }
-                            webTranslateSb.append("\n");
-                        }
-                        adapter.getCurrentView().setTranslate(webTranslateSb.toString());
-                    }
-                }
+                adapter.getCurrentView().setTranslate(StringFormer.formatTranslate(translate));
             }
         });
     }

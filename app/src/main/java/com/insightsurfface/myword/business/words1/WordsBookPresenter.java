@@ -12,6 +12,7 @@ import com.insightsurfface.myword.okhttp.HttpService;
 import com.insightsurfface.myword.okhttp.RetrofitUtil;
 import com.insightsurfface.myword.utils.Logger;
 import com.insightsurfface.myword.utils.SharedPreferencesUtils;
+import com.insightsurfface.myword.utils.StringFormer;
 import com.youdao.sdk.app.LanguageUtils;
 import com.youdao.sdk.ydonlinetranslate.Translator;
 import com.youdao.sdk.ydtranslate.Translate;
@@ -55,7 +56,7 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
     public void translateWord(final Words word) {
         boolean usePremiumTranslate = SharedPreferencesUtils.getBooleanSharedPreferencesData
                 (mContext, ShareKeys.OPEN_PREMIUM_KEY, false);
-        if (!TextUtils.isEmpty(word.getTranslate()) && !usePremiumTranslate) {
+        if (!TextUtils.isEmpty(word.getTranslate())) {
             mView.displayTranslate(word.getTranslate());
             return;
         }
@@ -66,15 +67,19 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
                 @Override
                 public void onError(TranslateErrorCode code, String s) {
                     Logger.d("error" + s);
-                    mView.displayMsg("没查到该词");
+                    mView.displayMsg("没查到该词(error)");
                 }
 
                 @Override
                 public void onResult(final Translate translate, final String s, String s1) {
                     if (null != translate && null != translate.getExplains() && translate.getExplains().size() > 0) {
                         mView.displayTranslate(translate);
+                        DbController.getInstance(mContext.getApplicationContext()).
+                                updateTranslate(word, StringFormer.formatTranslate(translate));
                     } else {
                         mView.displayMsg("没查到该词");
+                        DbController.getInstance(mContext.getApplicationContext()).
+                                updateTranslate(word, "没查到该词");
                     }
                 }
 
@@ -98,7 +103,7 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
                             DbController.getInstance(mContext.getApplicationContext()).
                                     updateTranslate(word, t);
                         } else {
-                            mView.displayMsg("没查到该词");
+                            mView.displayMsg("没查到该词...");
 //                            killWord(word);
                         }
                     } else {
