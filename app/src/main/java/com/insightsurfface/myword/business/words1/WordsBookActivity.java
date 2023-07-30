@@ -317,6 +317,7 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
         });
     }
 
+    @Override
     public synchronized void playVoice(String speakUrl) {
         YouDaoLog.e(AudioMgr.PLAY_LOG + "TranslateDetailActivity click to playVoice speakUrl = " + speakUrl);
         if (!TextUtils.isEmpty(speakUrl) && speakUrl.startsWith("http")) {

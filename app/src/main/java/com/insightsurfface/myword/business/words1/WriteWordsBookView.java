@@ -106,12 +106,12 @@ public class WriteWordsBookView extends RelativeLayout implements WordView {
                         wordEt.setVisibility(GONE);
                         translateTv.setTextSize(22);
                         translateTv.setGravity(Gravity.LEFT);
+                        if (null != onWordsBookViewListener) {
+                            onWordsBookViewListener.queryWord(word);
+                        }
                         if (TextUtils.isEmpty(translate)) {
                             //如果是空的 就通知查询单词
                             translateTv.setText(TRANSLATING);
-                            if (null != onWordsBookViewListener) {
-                                onWordsBookViewListener.queryWord(word);
-                            }
                         } else {
                             translateTv.setText(translate);
                         }

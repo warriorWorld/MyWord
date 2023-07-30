@@ -1,5 +1,8 @@
 package com.insightsurfface.myword.utils;
 
+import android.text.TextUtils;
+
+import com.insightsurfface.myword.config.ShareKeys;
 import com.youdao.sdk.ydtranslate.Translate;
 import com.youdao.sdk.ydtranslate.WebExplain;
 
@@ -28,6 +31,13 @@ public class StringFormer {
                 }
                 result = translateSb.toString();
             }
+        }
+        return result;
+    }
+    public static String formatTranslateWithSpeakUrl(Translate translate){
+        String result=formatTranslate(translate);
+        if (null!=translate&&!TextUtils.isEmpty(translate.getUSSpeakUrl())){
+            result+= ShareKeys.SPEAK_URL_SEPERATER +translate.getUSSpeakUrl();
         }
         return result;
     }

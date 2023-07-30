@@ -8,11 +8,21 @@ import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.insightsurfface.myword.R;
 import com.insightsurfface.myword.listener.OnImgSizeListener;
 import com.insightsurfface.myword.utils.DisplayUtil;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import org.greenrobot.eventbus.EventBus;
+
+import androidx.annotation.Nullable;
 
 
 public class WrapHeightImageView extends ImageView {
@@ -131,14 +141,33 @@ public class WrapHeightImageView extends ImageView {
     public void setImgUrl(final String url, final DisplayImageOptions options, int position) {
         this.position = position;
         setImageResource(R.drawable.ic_refresh_green);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mBitmap = ImageLoader.getInstance().loadImageSync(url, options);
-                Message msg = Message.obtain();
-                msg.what = 0;
-                mHandler.sendMessage(msg);
-            }
-        }).start();
+        if (url.endsWith(".gif") || url.endsWith(".GIF")) {
+            Glide.with(mContext)
+                    .asGif()
+                    .load(url)
+                    .thumbnail(0.1f)
+                    .addListener(new RequestListener<GifDrawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GifDrawable resource, Object model, Target<GifDrawable> target, DataSource dataSource, boolean isFirstResource) {
+                            return false;
+                        }
+                    })
+                    .into(this);
+        } else {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    mBitmap = ImageLoader.getInstance().loadImageSync(url, options);
+                    Message msg = Message.obtain();
+                    msg.what = 0;
+                    mHandler.sendMessage(msg);
+                }
+            }).start();
+        }
     }
 }

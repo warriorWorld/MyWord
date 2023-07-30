@@ -18,4 +18,5 @@ public class ShareKeys {
     public static final String IS_CREATOR = "is_creator";
     public static final String FILTER_KEY = "filter_key";
     public static final String IMAGE_SWITCH="image_switch";
+    public static final String SPEAK_URL_SEPERATER="speakUrl:";
 }

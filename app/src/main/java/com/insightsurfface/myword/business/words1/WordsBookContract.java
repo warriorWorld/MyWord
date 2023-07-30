@@ -37,5 +37,7 @@ public class WordsBookContract {
         void displayIncogizanceWord();
 
         void toNextWord();
+
+        void playVoice(String url);
     }
 }

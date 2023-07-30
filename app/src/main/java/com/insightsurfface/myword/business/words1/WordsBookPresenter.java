@@ -57,7 +57,17 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
         boolean usePremiumTranslate = SharedPreferencesUtils.getBooleanSharedPreferencesData
                 (mContext, ShareKeys.OPEN_PREMIUM_KEY, false);
         if (!TextUtils.isEmpty(word.getTranslate())) {
-            mView.displayTranslate(word.getTranslate());
+            if (word.getTranslate().contains(ShareKeys.SPEAK_URL_SEPERATER)) {
+                String[] results = word.getTranslate().split(ShareKeys.SPEAK_URL_SEPERATER);
+                if (results.length == 2) {
+                    mView.displayTranslate(results[0]);
+                    mView.playVoice(results[1]);
+                } else {
+                    mView.displayTranslate(word.getTranslate());
+                }
+            } else {
+                mView.displayTranslate(word.getTranslate());
+            }
             return;
         }
         if (usePremiumTranslate) {
@@ -75,7 +85,7 @@ public class WordsBookPresenter implements WordsBookContract.Presenter {
                     if (null != translate && null != translate.getExplains() && translate.getExplains().size() > 0) {
                         mView.displayTranslate(translate);
                         DbController.getInstance(mContext.getApplicationContext()).
-                                updateTranslate(word, StringFormer.formatTranslate(translate));
+                                updateTranslate(word, StringFormer.formatTranslateWithSpeakUrl(translate));
                     } else {
                         mView.displayMsg("没查到该词");
                         DbController.getInstance(mContext.getApplicationContext()).

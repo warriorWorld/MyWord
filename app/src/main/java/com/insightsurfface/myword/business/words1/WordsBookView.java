@@ -105,12 +105,12 @@ public class WordsBookView extends RelativeLayout implements WordView {
                         translateTv.setTextSize(22);
                         translateTv.setMaxLines(500);
                         translateTv.setGravity(Gravity.LEFT);
+                        if (null != onWordsBookViewListener) {
+                            onWordsBookViewListener.queryWord(word);
+                        }
                         if (TextUtils.isEmpty(translate)) {
                             //如果是空的 就通知查询单词
                             translateTv.setText(TRANSLATING);
-                            if (null != onWordsBookViewListener) {
-                                onWordsBookViewListener.queryWord(word);
-                            }
                         } else {
                             translateTv.setText(translate);
                         }
@@ -119,7 +119,8 @@ public class WordsBookView extends RelativeLayout implements WordView {
             }
         });
     }
-@Override
+
+    @Override
     public void performCardFlip() {
         Logger.d("performCardFlip");
         if (mSide == Side.Back) {
