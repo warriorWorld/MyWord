@@ -23,7 +23,7 @@
         android:maxLines="1"
         android:padding="26dp"
         android:text="Stranger"
-        android:textColor="@color/main_text_color"
+        android:textColor="@color/white"
         android:textSize="38sp"
         android:visibility="visible" />
 

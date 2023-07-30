@@ -111,7 +111,6 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     }
 
     private void doGetPaths() {
-        backgroundIv.setVisibility(PermissionUtil.isImageSwitched(this) ? View.VISIBLE : View.GONE);
         if (PermissionUtil.isMaster(this) && PermissionUtil.isImageSwitched(this)) {
             final String filter = SharedPreferencesUtils.getSharedPreferencesData(this, ShareKeys.FILTER_KEY);
             new Thread(new Runnable() {
@@ -130,7 +129,6 @@ public class WordsBookActivity extends TTSActivity implements OnClickListener, W
     }
 
     private void refreshBackground() {
-        backgroundIv.setVisibility(PermissionUtil.isImageSwitched(this) ? View.VISIBLE : View.GONE);
         if (PermissionUtil.isMaster(this) && PermissionUtil.isImageSwitched(this)) {
             backgroundIv.setImgUrl(pathList.get(currentImgPosition), Configure.smallImageOptions);
             currentImgPosition++;

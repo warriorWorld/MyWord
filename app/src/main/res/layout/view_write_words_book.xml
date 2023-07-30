@@ -22,7 +22,7 @@
         android:gravity="center"
         android:padding="26dp"
         android:text="Stranger"
-        android:textColor="@color/main_text_color"
+        android:textColor="@color/white"
         android:textSize="24sp"
         android:visibility="visible" />
 
